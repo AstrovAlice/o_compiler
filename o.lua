@@ -12,12 +12,8 @@ print("it's a O compiler")
 print("compiling is complite")
 -- ovm.printCode(gen.PC)
 
-local t1 = os.date("%H:%M:%S")
+local start_time = os.clock()
 -- ovm.Run()
-local t2 = os.date("%H:%M:%S")
+local end_time = os.clock()
 
-local time = t2
-print("runing time: " ..time.. "c")
-
-text.say_hello("Sofa")
-print(text.value)
+print("runing time: " ..(end_time - start_time).. "c")

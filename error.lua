@@ -1,12 +1,13 @@
 local loc = require("loc")
-local text = require("text")
+-- local text = require("text")
 
 local error = {}
 
 function error._error(msg, p)
-    while text.ch ~= text.chEOL and text.ch ~= text.chEOT do
-        text.NextCh()
-    end
+    -- while text.ch ~= text.chEOL and text.ch ~= text.chEOT do                                 нет возможности добавить сюда text, тк всё ломается
+    --     text.NextCh()
+    -- end
+    print()
     print(string.rep(' ', p - 1) .. '^')
     print(msg)
     os.exit(1)
