@@ -4,7 +4,7 @@ local text = require("text")
 -- local ovm = require("ovm")
 -- local gen = require("gen")
 
-print("it's a O compiler")
+print("it's a O-compiler")
 
 
 -- text.Reset()
