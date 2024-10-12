@@ -1,5 +1,6 @@
 -- text
---после создания loc проверить, что в nextCh всё связанное с ним робит
+local loc = require("loc")
+
 local text = {
     chEOT = "\0",
     chEOL = "\n",
@@ -32,7 +33,7 @@ function text.Reset()
     end
 end
 
-function text.nextCh()
+function text.NextCh()
     if text._i < #text._src then
         text.ch = text._src:sub(text._i, text._i) 
         io.write(text.ch) 

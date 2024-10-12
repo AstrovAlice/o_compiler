@@ -1,8 +1,8 @@
 --o compiler
-local text = require("4lab.text")
--- local pars = require("4lab.pars")
--- local ovm = require("4lab.ovm")
--- local gen = require("4lab.gen")
+local text = require("text")
+-- local pars = require("pars")
+-- local ovm = require("ovm")
+-- local gen = require("gen")
 
 print("it's a O compiler")
 
