@@ -1,14 +1,14 @@
 --o compiler
 local text = require("text")
--- local pars = require("pars")
--- local ovm = require("ovm")
--- local gen = require("gen")
+local pars = require("pars")
+local ovm = require("ovm")
+local gen = require("gen")
 
 print("it's a O-compiler")
 
 
--- text.Reset()
--- pars.Compile()
+text.Reset()
+pars.Compile()
 print("compiling is complite")
 -- ovm.printCode(gen.PC)
 

@@ -1,5 +1,7 @@
 --table
 
+local items = require("items")
+
 local table = {
 
 }
