@@ -1,6 +1,7 @@
 --pars
 local text = require("text")
 local scan = require("scan")
+
 local table = require("table")
 local items = require("items")
 local gen = require("gen")
@@ -16,10 +17,14 @@ Types = {
     Int = 1
 }
 
-function pars.Compile(args)
-    print(text._src)
-    text.nextCh()
-    text.nextLex()
+function pars.Compile()
+    -- print(text._src)
+    while text.ch ~= text.EOT do
+        text.NextCh()
+    end
+    -- text.nextLex()
+    -- print(text.ch)
+    -- print(text.nextLex())
     -- table.openScope()
 
     T = Types

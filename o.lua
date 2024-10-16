@@ -9,6 +9,7 @@ print("it's a O-compiler")
 
 text.Reset()
 pars.Compile()
+
 print("compiling is complite")
 -- ovm.printCode(gen.PC)
 

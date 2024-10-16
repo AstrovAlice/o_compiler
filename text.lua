@@ -37,7 +37,8 @@ end
 
 function text.NextCh()
     if text._i < #text._src then
-        text.ch = text._src:sub(text._i, text._i) 
+        text.ch = text._src[text._i]
+        text.ch = string.sub(text._src, text._i, text._i)
         io.write(text.ch)
         loc.pos = loc.pos + 1
         text._i = text._i + 1
@@ -46,7 +47,7 @@ function text.NextCh()
             loc.pos = 0
         end
     else
-        text.ch = text.chEOT  -- Конец файла
+        text.ch = text.chEOT
     end
 end
 
