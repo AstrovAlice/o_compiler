@@ -2,10 +2,10 @@
 
 local lexemes = {
     Lex = {
-        NONE = 0,
-        NAME = 1,
-        NUM = 2,
-        MODULE = 3,
+        NONE = "NONE",
+        NAME = "NAME",
+        NUM = "NUM",
+        MODULE = "MODELE",
         IMPORT = 4,
         BEGIN = 5,
         END = 6,

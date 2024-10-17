@@ -1,9 +1,11 @@
+--ErrorUnit
+
 local loc = require("loc")
 -- local text = require("text")
 
-local error = {}
+local ErrorUnit = {}
 
-function error._error(msg, p)
+function ErrorUnit._error(msg, p)
     -- while text.ch ~= text.chEOL and text.ch ~= text.chEOT do                                 нет возможности добавить сюда text, тк всё ломается
     --     text.NextCh()
     -- end
@@ -14,15 +16,15 @@ function error._error(msg, p)
 end
 
 function LexError(msg)
-    error._error(msg, loc.pos)
+    ErrorUnit._error(msg, loc.pos)
 end
 
 function Expect(msg)
-    error._error("expect "..msg, loc.lexPos)
+    ErrorUnit._error("expect "..msg, loc.lexPos)
 end
 
 function CtxError(msg)
-    error._error(msg, loc.lexPos)
+    ErrorUnit._error(msg, loc.lexPos)
 end
 
 function Error(msg)
@@ -36,4 +38,4 @@ function Warmimg(msg)
     print(msg)
 end
 
-return error
+return ErrorUnit

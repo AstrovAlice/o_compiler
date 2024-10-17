@@ -1,33 +1,33 @@
 -- text
 local loc = require("loc")
-local error = require("error")
+local ErrorUnit = require("ErrorUnit")
 
 local text = {
     chEOT = "\0",
     chEOL = "\n",
-    chSPACE = ' ',
-    chTAB = '\t',
+    chSPACE = " ",
+    chTAB = "\t",
 
     _src = nil,
-    _i = 0,
+    _i = 1,
     ch = ""
 }
 
 function text.Reset(args)
     local args = {"", "test\\Prime.o"}
     if #args < 2 then
-        error.Error("Запуск: lua O.lua <файл программы>")
+        ErrorUnit.Error("Запуск: lua O.lua <файл программы>")
     else
         -- Пытаемся открыть файл
         local file, err = io.open(args[2], "r")
         if not file then
-            error.Error("Ошибка открытия файла: " .. err)
+            ErrorUnit.Error("Ошибка открытия файла: " .. err)
         end
 
         local content, read_err = file:read("*a")
         if not content then
             file:close()
-            error.Error("Ошибка чтения файла: " .. read_err)
+            ErrorUnit.Error("Ошибка чтения файла: " .. read_err)
         end
 
         text._src = content
