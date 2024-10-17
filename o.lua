@@ -11,10 +11,10 @@ text.Reset()
 pars.Compile()
 
 print("compiling is complite")
--- ovm.printCode(gen.PC)
+ovm.PrintCode(gen.PC)
 
 local start_time = os.clock()
--- ovm.Run()
+ovm.Run()
 local end_time = os.clock()
 
 print("runing time: " ..(end_time - start_time).. "c")

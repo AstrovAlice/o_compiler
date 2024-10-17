@@ -17,9 +17,14 @@ Types = {
     Int = 1
 }
 
+-- function pars.nextChar()
+--     ch = text.NextCh()
+--     return ch
+-- end
+
 function pars.Compile()
     -- print(text._src)
-    while text.ch ~= text.EOT do
+    while text.ch ~= text.EOT and text._i < #text._src do
         text.NextCh()
     end
     -- text.nextLex()

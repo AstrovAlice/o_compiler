@@ -51,6 +51,13 @@ local scan = {
     }
 }
 
+function scan.nextChar()
+    ch = text.NextCh()
+    return ch
+end
 
+function scan.S()
+    print(ch)
+end
 
 return scan
