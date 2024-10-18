@@ -89,6 +89,21 @@ function scan.scanIdent()
     end
 end
 
+function scan.scanNumber()
+    assert(text.ch >= "0" and text.ch <= "9")
+    scan.value = string.byte(text.ch) - string.byte("0")
+    text.NextCh()
+    while (text.ch >= "0" and text.ch <= "9") do
+        local d = string.byte(text.ch) - string.byte("0")
+        scan.value = scan.value * 10 + d
+        if scan.value > scan.MAXINT then
+            error(string.format("слишком большое число, максимум %d", scan.MAXINT))
+        end
+        text.NextChar()
+    end
+    return Lex.NUM
+end
+
 function scan.NextLex()
     while text.ch == " " or text.ch == "\t" or text.ch == "\r" or text.ch == "\n" do
         text.NextCh()

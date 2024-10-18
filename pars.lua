@@ -17,16 +17,6 @@ Types = {
     Int = 1
 }
 
--- function pars.NextCh()
---     ch = text.NextCh()
---     return ch
--- end
-
--- function pars.NextLex()
---     lex = scan.NextLex()
---     return lex
--- end
-
 function Skip(L)
     if scan.lex == L then
         scan.NextLex()
@@ -36,7 +26,7 @@ function Skip(L)
 end
 
 function Check(L)
-    if scan.Lex ~= L then
+    if scan.lex ~= L then
         ErrorUnit.Expect(scan.lexName(L))
     end
 end
@@ -49,21 +39,166 @@ function ImportModule()
     else
         ErrorUnit.CtxError("Предусмотрены только модули In и Out")
     end
-    text.NextLex()
+    scan.NextLex()
 end
 
 function Import()
     Skip(Lex.IMPORT)
     ImportModule()
     while scan.lex == Lex.COMMA do
-        text.NextLex()
+        scan.NextLex()
         ImportModule()
     end
     Skip(Lex.SEMI)
 end
 
+function ConstExpr()
+    local sign = 1
+    if scan.lex == Lex.PLUS or scan.lex == Lex.MINUS then
+        if scan.lex == Lex.MINUS then
+            sign = -1
+        end
+        scan.NextLex()
+    end
+    if scan.lex == Lex.NUM then
+        local value = scan.value * sign
+        scan.NextLex()
+        return value
+    elseif scan.lex == Lex.NAME then
+        -- local x = table.find(scan.name)
+        -- scan.NextLex()
+        -- if type(x) ~= items.Const then
+        --     ErrorUnit.Expect("const")
+        -- else
+        --     return x.value * sign
+        -- end
+    else
+        ErrorUnit.Expect("number or name")
+    end
+end
+
+function ConstDecl()
+    Check(Lex.NAME)
+    local name = scan.name
+    scan.NextLex()
+    Skip(Lex.EQ)
+    local value = ConstExpr()
+    -- table.new(items.Const(name, Types.Int, value))
+end
+
+function Type()
+    Check(Lex.NAME)
+    -- x = table.find(scan.name)
+    -- if type(x) ~= items.Type then
+    --     ErrorUnit.Expect("name of type")
+    -- end
+    scan.NextLex()
+end
+
+function VarDecl()
+    Check(Lex.NAME)
+    -- table.new(items.Var(scan.name, Types.Int))
+    scan.NextLex()
+    while scan.lex == Lex.COMMA do
+        scan.NextLex()
+        Check(Lex.NAME)
+        -- table.new(items.Var(scan.name, Types.Int))
+        scan.NextLex()
+    end
+    Skip(Lex.COLON)
+    Type()
+end
+
 function DeclSeq()
-    print("DeclSeq")
+    while scan.lex == Lex.CONST or scan.lex == Lex.VAR do
+        if scan.lex == Lex.CONST then
+            scan.NextLex()
+            while scan.lex == Lex.NAME do
+                ConstDecl()
+                Skip(Lex.SEMI)
+            end
+        else
+            scan.NextLex()
+            while scan.lex == Lex.NAME do
+                VarDecl()
+                Skip(Lex.SEMI)
+            end
+        end
+    end
+end
+
+function AssOrCall()
+    -- Check(Lex.NAME)
+    -- x = table.find(scan.name)
+    -- if type(x) == items.Var then
+    --     AssStatement(x)
+    -- elseif type(x) == items.Proc or type(x) == items.Module then
+    --     CallStatement(x)
+    -- else
+    --     ErrorUnit.Expect("name of function or variable")
+    -- end
+end
+
+function IfStatement()
+    -- Skip(Lex.IF)
+    -- BoolExpr()
+    -- CondPC = gen.PC
+    -- LastGOTO = 0
+    -- skip(Lex.THEN)
+    -- StatSeq()
+    -- while scan.lex == Lex.ELSIF:
+    --     gen.Cmd(LastGOTO)
+    --     gen.Cmd(cm.GOTO)
+    --     LastGOTO = gen.PC
+    --     gen.fixup(CondPC, gen.PC)
+    --     nextLex()
+    --     BoolExpr()
+    --     CondPC = gen.PC  # Тут была ошибка. Этой строки не было.
+    --     skip(Lex.THEN)
+    --     StatSeq()
+    -- if scan.lex == Lex.ELSE:
+    --     gen.Cmd(LastGOTO)
+    --     gen.Cmd(cm.GOTO)
+    --     LastGOTO = gen.PC
+    --     gen.fixup(CondPC, gen.PC)
+    --     scan.NextLex()
+    --     StatSeq()
+    -- else:
+    --     gen.fixup(CondPC, gen.PC)
+    -- Skip(Lex.END)
+    -- gen.fixup(LastGOTO, gen.PC)
+end
+
+function WhileStatement()
+    -- WhilePC = gen.PC
+    -- Skip(Lex.WHILE)
+    -- BoolExpr()
+    -- CondPC = gen.PC
+    -- skip(Lex.DO)
+    -- StatSeq()
+    -- skip(Lex.END)
+    -- gen.Cmd(WhilePC)
+    -- gen.Cmd(cm.GOTO)
+    -- # ovm.M[CondPC-2] = gen.PC
+    -- gen.fixup(CondPC, gen.PC)
+end
+
+function Statement()
+    if scan.lex == Lex.NAME then
+        AssOrCall()
+    elseif scan.lex == Lex.IF then
+        IfStatement()
+    elseif scan.lex == Lex.WHILE then
+        WhileStatement()
+    end
+end
+
+function StatSeq()
+    Statement()
+    while scan.lex == Lex.SEMI do
+        scan.NextLex()
+        Statement()
+    end
 end
 
 function Module()
@@ -73,24 +208,27 @@ function Module()
         -- Table.new(items.Module(module))
         scan.NextLex()
     else
-        ErrorUnit.Expect("имя")
+        ErrorUnit.Expect("name")
     end
     Skip(Lex.SEMI)
     if scan.lex == Lex.IMPORT then
-        -- Import()
+        Import()
     end
-    -- DeclSeq()
+    DeclSeq()
     if scan.lex == Lex.BEGIN then
-        text.NextLex()
-        -- StatSeq()
+        scan.NextLex()
+        StatSeq()
     end
     Skip(Lex.END)
     Check(Lex.NAME)
 
+    -- scan.NextLex()
+    -- Skip(Lex.DOT)
+
     -- x = Table.find(scan.name)
     -- if type(x) != items.Module:
     --     error.expect("имя модуля")
-    -- elif x.name != module:  # Пeтров Георгий
+    -- elif x.name != module:  
     --     error.expect("имя модуля " + module)
     -- nextLex()
     -- skip(Lex.DOT)
@@ -123,6 +261,7 @@ function pars.Compile()
     Module()
     -- Table.closeScope()
     -- Table.closeScope()
+    print("\n")
 end
 
 return pars

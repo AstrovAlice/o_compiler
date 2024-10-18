@@ -1,3 +1,10 @@
 MODULE Primes;
-
-END Primes.
+IMPORT
+   Out, In;
+VAR
+   n, c: INTEGER;
+CONST
+   w = 3;
+BEGIN
+   n := 2;
+END Primes
