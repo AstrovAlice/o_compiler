@@ -49,9 +49,9 @@ local scan = {
         ["WITH"] = Lex.NONE
     },
     _names = {
-        [Lex.NAME]  = "имя",
-        [Lex.NUM]   = "число",
-        [Lex.MULT]  =  "*",
+        [Lex.NAME]  = "name",
+        [Lex.NUM]   = "number",
+        [Lex.MULT]  = "*",
         [Lex.PLUS]  = "+",
         [Lex.MINUS] = "-",
         [Lex.EQ]    = "=",
@@ -64,10 +64,10 @@ local scan = {
         [Lex.COMMA] = ",",
         [Lex.COLON] = ":",
         [Lex.SEMI]  = ";",
-        [Lex.ASS]   =  ":=",
-        [Lex.LPAR]  =  "(",
-        [Lex.RPAR]  =  ")",
-        [Lex.EOT]   = "конец текста"
+        [Lex.ASS]   = ":=",
+        [Lex.LPAR]  = "(",
+        [Lex.RPAR]  = ")",
+        [Lex.EOT]   = "end of text"
     }
 }
 
@@ -76,7 +76,7 @@ function scan.lexName(L)
 end
 
 function scan.scanIdent()
-    local name = text.ch
+    scan.name = text.ch
     text.NextCh()
     while "A" <= text.ch and text.ch <= "Z" or "a" <= text.ch and text.ch <= "z" or "0" <= text.ch and text.ch <= "9" do
         scan.name = scan.name..text.ch
@@ -95,72 +95,71 @@ function scan.NextLex()
     end
     scan.lexPos = text.pos
     if "A" <= text.ch and text.ch <= "Z" or "a" <= text.ch and text.ch <= "z" then
-        -- scan.scanIdent()
         scan.lex = scan.scanIdent()
     elseif "0" <= text.ch and text.ch <= "9" then
-        return scan.scanNumber()
+        scan.lex = scan.scanNumber()
     elseif text.ch == ";" then
         text.NextCh()
-        return Lex.SEMICOLON
+        scan.lex = Lex.SEMI
     elseif text.ch== ":" then
         text.NextCh()
         if text.ch == "=" then
             text.NextCh()
-            return Lex.ASSIGN
+            scan.lex = Lex.ASSIGN
         else
-            return Lex.COLON
+            scan.lex = Lex.COLON
         end
     elseif text.ch == "," then
         text.NextCh()
-        return Lex.COMMA
+        scan.lex = Lex.COMMA
     elseif text.ch == "(" then
         text.NextCh()
         if text.ch == "*" then
             text.NextCh()
             scan.skipComment()
-            return scan()
+            scan.lex = scan()
         else
-            return Lex.LPAR
+            scan.lex = Lex.LPAR
         end
     elseif text.ch == ")" then
         text.NextCh()
-        return Lex.RPAR
+        scan.lex = Lex.RPAR
     elseif text.ch == "." then
         text.NextCh()
-        return Lex.DOT
+        scan.lex = Lex.DOT
     elseif text.ch == "+" then
         text.NextCh()
-        return Lex.PLUS
+        scan.lex = Lex.PLUS
     elseif text.ch == "-" then
         text.NextCh()
-        return Lex.MINUS
+        scan.lex = Lex.MINUS
     elseif text.ch == "*" then
         text.NextCh()
-        return Lex.MULTIPLY
+        scan.lex = Lex.MULTIPLY
     elseif text.ch == "=" then
         text.NextCh()
-        return Lex.EQ
+        scan.lex = Lex.EQ
     elseif text.ch == "#" then
         text.NextCh()
-        return Lex.NE
+        scan.lex = Lex.NE
     elseif text.ch == "<" then
         text.NextCh()
         if text.ch == "=" then
             text.NextCh()
-            return Lex.LE
+            scan.lex = Lex.LE
         else
-            return Lex.LT
+            scan.lex = Lex.LT
         end
     elseif text.ch == ">" then
         text.NextCh()
         if text.ch == "=" then
             text.NextCh()
-            return Lex.GE
+            scan.lex = Lex.GE
         else
-            return Lex.GT
+            scan.lex = Lex.GT
         end
     elseif text.ch == text.chEOT then
-        return Lex.EOT
+        scan.lex = Lex.EOT
     else
         print(text.ch)
         ErrorUnit.Error("недопустимый символ")

@@ -23,7 +23,7 @@ function ErrorUnit.Expect(msg)
     ErrorUnit._error("expect "..msg, loc.lexPos)
 end
 
-function CtxError(msg)
+function ErrorUnit.CtxError(msg)
     ErrorUnit._error(msg, loc.lexPos)
 end
 

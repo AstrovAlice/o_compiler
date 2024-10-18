@@ -4,7 +4,7 @@ local scan = require("scan")
 local ErrorUnit = require("ErrorUnit")
 local Lex = require("Lexemes")
 
-local table = require("table")
+local Table = require("Table")
 local items = require("items")
 local gen = require("gen")
 local ovm = require("ovm")
@@ -35,25 +35,59 @@ function Skip(L)
     end
 end
 
+function Check(L)
+    if scan.Lex ~= L then
+        ErrorUnit.Expect(scan.lexName(L))
+    end
+end
+
+function ImportModule()
+    Check(Lex.NAME)
+    local name = scan.name
+    if name == "In" or name == "Out" then
+        -- Table.new(items.Module(name))
+    else
+        ErrorUnit.CtxError("Предусмотрены только модули In и Out")
+    end
+    text.NextLex()
+end
+
+function Import()
+    Skip(Lex.IMPORT)
+    ImportModule()
+    while scan.lex == Lex.COMMA do
+        text.NextLex()
+        ImportModule()
+    end
+    Skip(Lex.SEMI)
+end
+
+function DeclSeq()
+    print("DeclSeq")
+end
+
 function Module()
     Skip(Lex.MODULE)
     if scan.lex == Lex.NAME then
-        local module = scan.name  -- Петров Гергий
-        -- table.new(items.Module(module))
+        -- local module = scan.name
+        -- Table.new(items.Module(module))
         scan.NextLex()
     else
         ErrorUnit.Expect("имя")
-    end-- жопа не конец
-        -- skip(Lex.SEMI)
-    -- if scan.lex == Lex.IMPORT:
-    --     Import()
+    end
+    Skip(Lex.SEMI)
+    if scan.lex == Lex.IMPORT then
+        -- Import()
+    end
     -- DeclSeq()
-    -- if scan.lex == Lex.BEGIN:
-    --     nextLex()
-    --     StatSeq()
-    -- skip(Lex.END)
-    -- check(Lex.NAME)
-    -- x = table.find(scan.name)
+    if scan.lex == Lex.BEGIN then
+        text.NextLex()
+        -- StatSeq()
+    end
+    Skip(Lex.END)
+    Check(Lex.NAME)
+
+    -- x = Table.find(scan.name)
     -- if type(x) != items.Module:
     --     error.expect("имя модуля")
     -- elif x.name != module:  # Пeтров Георгий
@@ -68,27 +102,27 @@ function pars.Compile()
     text.NextCh()
     scan.name = text.ch
     scan.NextLex()
-    -- table.openScope()
+    -- Table.openScope()
 
     T = Types
 
-    -- table.add(items.Func("abs", T.Int))
-    -- table.add(items.Func("max", T.Int))
-    -- table.add(items.Func("min", T.Int))
-    -- table.add(items.Func("odd", T.Bool))
-    -- table.add(items.Proc("halt"))
-    -- table.add(items.Proc("inc"))
-    -- table.add(items.Proc("dec"))
-    -- table.add(items.Proc("In.open"))
-    -- table.add(items.Proc("In.int"))
-    -- table.add(items.Proc("Out.int"))
-    -- table.add(items.Proc("Out.ln"))
-    -- table.add(items.Type("int", T.Int))
+    -- Table.add(items.Func("abs", T.Int))
+    -- Table.add(items.Func("max", T.Int))
+    -- Table.add(items.Func("min", T.Int))
+    -- Table.add(items.Func("odd", T.Bool))
+    -- Table.add(items.Proc("halt"))
+    -- Table.add(items.Proc("inc"))
+    -- Table.add(items.Proc("dec"))
+    -- Table.add(items.Proc("In.open"))
+    -- Table.add(items.Proc("In.int"))
+    -- Table.add(items.Proc("Out.int"))
+    -- Table.add(items.Proc("Out.ln"))
+    -- Table.add(items.Type("int", T.Int))
 
-    -- table.openScope()
+    -- Table.openScope()
     Module()
-    -- table.closeScope()
-    -- table.closeScope()
+    -- Table.closeScope()
+    -- Table.closeScope()
 end
 
 return pars
