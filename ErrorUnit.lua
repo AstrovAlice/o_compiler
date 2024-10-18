@@ -15,11 +15,11 @@ function ErrorUnit._error(msg, p)
     os.exit(1)
 end
 
-function LexError(msg)
+function ErrorUnit.LexError(msg)
     ErrorUnit._error(msg, loc.pos)
 end
 
-function Expect(msg)
+function ErrorUnit.Expect(msg)
     ErrorUnit._error("expect "..msg, loc.lexPos)
 end
 
@@ -27,13 +27,13 @@ function CtxError(msg)
     ErrorUnit._error(msg, loc.lexPos)
 end
 
-function Error(msg)
+function ErrorUnit.Error(msg)
     print()
     print(msg)
     os.exit(2)
 end
 
-function Warmimg(msg)
+function ErrorUnit.Warmimg(msg)
     print()
     print(msg)
 end

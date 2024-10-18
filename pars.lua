@@ -2,7 +2,7 @@
 local text = require("text")
 local scan = require("scan")
 local ErrorUnit = require("ErrorUnit")
-local Lex = require("Lexemes").Lex
+local Lex = require("Lexemes")
 
 local table = require("table")
 local items = require("items")
@@ -29,26 +29,22 @@ Types = {
 
 function Skip(L)
     if scan.lex == L then
-        text.NextLex()
+        scan.NextLex()
     else
-        -- ErrorUnit.expect(scan.lexName(L)) --ниже мой вариант
-        -- ErrorUnit.Expect(scan.lexName(L))
-        print()
-        print("expect bla-bla-bla")
+        ErrorUnit.Expect(L)
     end
 end
 
 function Module()
     Skip(Lex.MODULE)
     if scan.lex == Lex.NAME then
-        print("ЫЫЫЫЫЫЫЫЫЫ")
-    end
-    --     module = scan.name  # Петров Гергий
-    --     table.new(items.Module(module))
-    --     nextLex()
-    -- else:
-    --     error.expect("имя")
-    -- skip(Lex.SEMI)
+        local module = scan.name  -- Петров Гергий
+        -- table.new(items.Module(module))
+        scan.NextLex()
+    else
+        ErrorUnit.Expect("имя")
+    end-- жопа не конец
+        -- skip(Lex.SEMI)
     -- if scan.lex == Lex.IMPORT:
     --     Import()
     -- DeclSeq()
@@ -70,6 +66,7 @@ end
 
 function pars.Compile()
     text.NextCh()
+    scan.name = text.ch
     scan.NextLex()
     -- table.openScope()
 

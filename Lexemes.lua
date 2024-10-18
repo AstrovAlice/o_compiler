@@ -5,7 +5,7 @@ local lexemes = {
         NONE = "NONE",
         NAME = "NAME",
         NUM = "NUM",
-        MODULE = "MODELE",
+        MODULE = "MODULE",
         IMPORT = 4,
         BEGIN = 5,
         END = 6,
@@ -40,4 +40,4 @@ local lexemes = {
     }
 }
 
-return lexemes
+return lexemes.Lex
