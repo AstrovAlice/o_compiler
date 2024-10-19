@@ -1,11 +1,11 @@
 --Table
-local Table = {}
+local Table = {
+    _table = {}
+}
 
 --imports
 local items = require("items")
 local ErrorUnit = require("ErrorUnit")
-
---var
 
 
 --function for Table only
@@ -18,40 +18,39 @@ function CloseScope()
 end
 
 function Add(item)
-    last = Table._table[#Table._table]
+    local last = Table._table[#Table._table]
     last[item.name] = item
 end
 
 --function
 function Table.New(item)
     local last = Table._table[#Table._table]
-    if item.name ~= last then                                                                  --!!!
-        ErrorUnit.CtxError("Повторное объявление имени")
+    if item.name ~= last then
+        ErrorUnit.CtxError("secend initialising of this name")
     else
         Add(item)
     end
 end
 
+function Table.find(name)
+    for i = #Table._table, 1, -1 do
+        local block = Table._table[i]
+        if block[name] then
+            return block[name]
+        end
+    end
+    error("non declared name")
+end
+
+function Table.GetVars()
+    local vars = {}
+    local lastBlock = Table._table[#Table._table]
+    for item in lastBlock.values() do
+        if type(item) == items.Var then
+            vars.append(item)
+        end
+    end
+    return vars
+end
+
 return Table
--- def new(item):
---     last = _table[-1]
---     if item.name in last:
---         error.ctxError("Повторное объявление имени")
---     else:
---         add(item)
-
-
--- def find(name):
---     for block in reversed(_table):
---         if name in block:
---             return block[name]
---     error.ctxError("Необъявленное имя")
-
-
--- def getVars():
---     vars = []
---     lastBlock = _table[-1]
---     for item in lastBlock.values():
---         if type(item) == items.Var:
---             vars.append(item)
---     return vars

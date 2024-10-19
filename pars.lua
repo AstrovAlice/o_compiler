@@ -220,7 +220,9 @@ function Module()
         StatSeq()
     end
     Skip(Lex.END)
-    Check(Lex.NAME)
+    -- Check(Lex.NAME)
+    Skip(Lex.NAME)
+    Skip(Lex.DOT)
 
     -- scan.NextLex()
     -- Skip(Lex.DOT)

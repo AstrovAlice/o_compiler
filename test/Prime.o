@@ -6,4 +6,4 @@ VAR
 CONST
    w = 3;
 
-END Primes
+END Primes.
