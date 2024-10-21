@@ -25,8 +25,8 @@ end
 --function
 function Table.New(item)
     local last = Table._table[#Table._table]
-    if item.name ~= last then
-        ErrorUnit.CtxError("secend initialising of this name")
+    if item.name == last.name then
+        ErrorUnit.CtxError("Re-announcement of name")
     else
         Table.Add(item)
     end

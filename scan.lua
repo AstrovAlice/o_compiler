@@ -104,6 +104,28 @@ function scan.scanNumber()
     return Lex.NUM
 end
 
+function scan.SkipComment()
+    text.NextCh()
+    while not (text.ch == '*' or text.ch == text.chEOT or text.ch == '(') do
+        text.NextCh()
+
+        if text.ch == text.chEOT then
+            ErrorUnit.LexError("Не закончен комментарий")
+        elseif text.ch == '*' then
+            text.NextCh()
+            if text.ch == ')' then
+                text.NextCh()
+                break
+            end
+        else
+            text.NextCh()
+            if text.ch == '*' then
+                scan.SkipComment()
+            end
+        end
+    end
+end
+
 function scan.NextLex()
     while text.ch == " " or text.ch == "\t" or text.ch == "\r" or text.ch == "\n" do
         text.NextCh()
@@ -131,7 +153,7 @@ function scan.NextLex()
         text.NextCh()
         if text.ch == "*" then
             text.NextCh()
-            scan.skipComment()
+            scan.SkipComment()
             scan.lex = scan()
         else
             scan.lex = Lex.LPAR

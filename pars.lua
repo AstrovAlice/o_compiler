@@ -13,8 +13,8 @@ local ovm = require("ovm")
 local pars = {}
 
 Types = {
-    Bool = 0,
-    Int = 1
+    Bool = "boolean",
+    Int = "number"
 }
 
 function Skip(L)
@@ -35,7 +35,7 @@ function ImportModule()
     Check(Lex.NAME)
     local name = scan.name
     if name == "In" or name == "Out" then
-        -- Table.new(items.Module(name))
+        Table.New(Items.Module:new(name))
     else
         ErrorUnit.CtxError("Предусмотрены только модули In и Out")
     end
@@ -83,13 +83,13 @@ function ConstDecl()
     scan.NextLex()
     Skip(Lex.EQ)
     local value = ConstExpr()
-    Table.New(Items.Const(name, Types.Int, value))
+    Table.New(Items.Const:new(name, Types.Int, value))
 end
 
 function Type()
     Check(Lex.NAME)
     local x = Table.Find(scan.name)
-    if type(x) ~= Items.Type then
+    if type(x) ~= type(Items.Type) then
         ErrorUnit.Expect("name of type")
     end
     scan.NextLex()
@@ -97,12 +97,12 @@ end
 
 function VarDecl()
     Check(Lex.NAME)
-    -- Table.New(Items.Var(scan.name, Types.Int))
+    Table.New(Items.Var:new(scan.name, Types.Int))
     scan.NextLex()
     while scan.lex == Lex.COMMA do
         scan.NextLex()
         Check(Lex.NAME)
-        -- Table.New(Items.Var(scan.name, Types.Int))
+        Table.New(Items.Var:new(scan.name, Types.Int))
         scan.NextLex()
     end
     Skip(Lex.COLON)
@@ -128,15 +128,15 @@ function DeclSeq()
 end
 
 function AssOrCall()
-    -- Check(Lex.NAME)
-    -- x = table.find(scan.name)
-    -- if type(x) == items.Var then
-    --     AssStatement(x)
-    -- elseif type(x) == items.Proc or type(x) == items.Module then
-    --     CallStatement(x)
-    -- else
-    --     ErrorUnit.Expect("name of function or variable")
-    -- end
+    Check(Lex.NAME)
+    x = Table.Find(scan.name)
+    if type(x) == items.Var then
+        --AssStatement(x)
+    elseif type(x) == Items.Proc or type(x) == Items.Module then
+        --CallStatement(x)
+    else
+        ErrorUnit.Expect("name of function or variable")
+    end
 end
 
 function IfStatement()
@@ -205,7 +205,7 @@ function Module()
     Skip(Lex.MODULE)
     if scan.lex == Lex.NAME then
         local module = scan.name
-        -- Table.New(Items.Module(module))
+        Table.New(Items.Module:new(module))
         scan.NextLex()
     else
         ErrorUnit.Expect("name")
@@ -221,12 +221,6 @@ function Module()
     end
     Skip(Lex.END)
     Check(Lex.NAME)
-    -- Skip(Lex.NAME)
-    -- Skip(Lex.DOT)
-
-    -- scan.NextLex()
-    -- Skip(Lex.DOT)
-
     -- local x = Table.find(scan.name)
     -- if type(x) != items.Module:
     --     error.expect("имя модуля")
