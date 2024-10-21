@@ -7,8 +7,8 @@ local Lex = require("Lexemes").Lex
 gen.PC = 0
 
 function gen.Cmd(cmd)
-    ovm.M[gen.PC] = cmd
-    gen.PC = gen.PC + 1
+    -- ovm.M[gen.PC] = cmd
+    -- gen.PC = gen.PC + 1
 end
 
 function gen.Const(c)

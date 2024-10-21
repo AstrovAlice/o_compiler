@@ -1,5 +1,4 @@
-MODULE Primes;
-
+MODULE Prime;
 IMPORT
    Out, In;
 
@@ -13,10 +12,6 @@ VAR
 
 BEGIN
    n := 1000;
-
-   In.Open;
-   In.Int(n);
-
    c := 0;
    i := 2;
    WHILE i <= n DO
@@ -35,8 +30,4 @@ BEGIN
       END;
       i := i + 1;
    END;
-   Out.Ln();
-   Out.Int(c, 0);
-   Out.Line();
-
 END Primes.

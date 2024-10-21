@@ -12,7 +12,7 @@ local text = {
     _i = 1,
     ch = ""
 }
-
+ 
 function text.Reset(args)
     local args = {"", "test\\Prime.o"}
     if #args < 2 then

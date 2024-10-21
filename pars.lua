@@ -127,26 +127,120 @@ function DeclSeq()
     end
 end
 
+function IntExpr()
+    local T = Expression()
+    if T ~= Types.Int then
+        ErrorUnit.Expect("выражение целого типа")
+    end
+end
+
+function Function(x)
+    if x.name == "ABS" then
+        IntExpr()
+        gen.Cmd(ovm.DUP)
+        gen.Cmd(0)
+        gen.Cmd(gen.PC + 3)
+        gen.Cmd(ovm.IFGE)
+        gen.Cmd(ovm.NEG)
+    elseif x.name == "MIN" then
+        Type()
+        gen.Cmd(scan.MAXINT)
+        gen.Cmd(ovm.NEG)
+        gen.Cmd(1)
+        gen.Cmd(ovm.SUB)
+    elseif x.name == "MAX" then
+        Type()
+        gen.Cmd(scan.MAXINT)
+    elseif x.name == "ODD" then
+        IntExpr()
+        gen.Cmd(2)
+        gen.Cmd(ovm.MOD)
+        gen.Cmd(0)
+        gen.Cmd(0)
+        gen.Cmd(ovm.IFEQ)
+    else
+        assert(false, "Unknown function: " .. x.name)
+    end
+end
+
+function Factor()
+    if scan.lex == Lex.NAME then
+        local x = Table.Find(scan.name)
+        if type(x) == Items.Const then
+            gen.Const(x.value)
+            scan.NextLex()
+            return x.type
+        elseif type(x) == Items.Var then
+            gen.Addr(x)
+            gen.Cmd(ovm.LOAD)
+            scan.NextLex()
+            return x.type
+        elseif type(x) == Items.Func then
+            scan.NextLex()
+            Skip(Lex.LPAR)
+            Function(x)
+            Skip(Lex.RPAR)
+            return x.type
+        else
+            ErrorUnit.Expect("name of const, variable or function")
+        end
+    elseif scan.lex == Lex.NUM then
+        gen.Cmd(scan.num)
+        scan.NextLex()
+        return Types.Int
+    elseif scan.lex == Lex.LPAR then
+        scan.NextLex()
+        T = Expression()
+        Skip(Lex.RPAR)
+        return T
+    else
+        ErrorUnit.Expect("name, number or  '('")
+    end
+end
+
+function Term()
+    local T = Factor()
+    while scan.lex == Lex.MULT or scan.lex ==  Lex.DIV or scan.lex ==  Lex.MOD do
+        Op = scan.lex
+        TestInt(T)
+        scan.NextLex()
+        T = Factor()
+        TestInt(T)
+        if Op == Lex.DIV then
+            gen.Cmd(ovm.DIV)
+        elseif Op == Lex.MULT then
+            gen.Cmd(ovm.MULT)
+        else
+            gen.Cmd(ovm.MOD)
+        end
+    end
+    return T
+end
+
 function SimpleExpression()
---     if scan.lex in {Lex.PLUS, Lex.MINUS}:
---         op = scan.lex
---         nextLex()
---         T = Term()
---         TestInt(T)
---         if op == Lex.MINUS:
---             gen.Cmd(cm.NEG)
---     else:
---         T = Term()
---     while scan.lex in {Lex.PLUS, Lex.MINUS}:
---         op = scan.lex
---         TestInt(T)
---         nextLex()
---         T = Term()
---         TestInt(T)
---         if op == Lex.PLUS:
---             gen.Cmd(cm.ADD)
---         else:
---             gen.Cmd(cm.SUB)
+    if scan.lex == Lex.PLUS or scan.lex ==Lex.MINUS then
+        local op = scan.lex
+        scan.NextLex()
+        local T = Term()
+        TestInt(T)
+        if op == Lex.MINUS then
+            gen.Cmd(ovm.NEG)
+        end
+    else
+        T = Term()
+    end
+    while scan.lex == Lex.PLUS or scan.lex ==Lex.MINUS do
+        local op = scan.lex
+        TestInt(T)
+        scan.NextLex()
+        T = Term()
+        TestInt(T)
+        if op == Lex.PLUS then
+            gen.Cmd(ovm.ADD)
+        else
+            gen.Cmd(ovm.SUB)
+        end
+    end
     return T
 end
 
@@ -174,13 +268,12 @@ function Expression()
 end
 
 function AssStatement(x)
-    -- gen.Addr(x)
+    gen.Addr(x)
     Skip(Lex.NAME)
     Skip(Lex.ASS)
     local T = Expression()
-    print(type(x.type)..type(T))
     if x.type ~= T then
-        ErrorUnit.ctxError("Несоответсвие типов при присваивании")
+        ErrorUnit.ctxError("Type mismatch during assignment")
     end
     gen.Cmd(ovm.SAVE)
 end
@@ -224,45 +317,57 @@ end
 
 function IfStatement()
     Skip(Lex.IF)
-    -- BoolExpr()
+    BoolExpr()
     CondPC = gen.PC
     LastGOTO = 0
     Skip(Lex.THEN)
     StatSeq()
-    -- while scan.lex == Lex.ELSIF:
-    --     gen.Cmd(LastGOTO)
-    --     gen.Cmd(cm.GOTO)
-    --     LastGOTO = gen.PC
-    --     gen.fixup(CondPC, gen.PC)
-    --     nextLex()
-    --     BoolExpr()
-    --     CondPC = gen.PC  # Тут была ошибка. Этой строки не было.
-    --     skip(Lex.THEN)
-    --     StatSeq()
-    -- if scan.lex == Lex.ELSE:
-    --     gen.Cmd(LastGOTO)
-    --     gen.Cmd(cm.GOTO)
-    --     LastGOTO = gen.PC
-    --     gen.fixup(CondPC, gen.PC)
-    --     scan.NextLex()
-    --     StatSeq()
-    -- else:
-    --     gen.fixup(CondPC, gen.PC)
-    -- Skip(Lex.END)
-    -- gen.fixup(LastGOTO, gen.PC)
+    while scan.lex == Lex.ELSIF do
+        gen.Cmd(LastGOTO)
+        gen.Cmd(cm.GOTO)
+        LastGOTO = gen.PC
+        gen.fixup(CondPC, gen.PC)
+        scan.NextLex()
+        BoolExpr()
+        CondPC = gen.PC
+        Skip(Lex.THEN)
+        StatSeq()
+    end
+    if scan.lex == Lex.ELSE then
+        gen.Cmd(LastGOTO)
+        gen.Cmd(cm.GOTO)
+        LastGOTO = gen.PC
+        gen.fixup(CondPC, gen.PC)
+        scan.NextLex()
+        StatSeq()
+    else
+        gen.fixup(CondPC, gen.PC)
+    end
+    Skip(Lex.END)
+    gen.fixup(LastGOTO, gen.PC)
+end
+
+function TestBool(T)
+    if T ~= Types.Bool then
+        ErrorUnit.Expect("boolean statement")
+    end
+end
+
+function BoolExpr()
+    local T = Expression()
+    TestBool(T)
 end
 
 function WhileStatement()
-    WhilePC = gen.PC
+    local WhilePC = gen.PC
     Skip(Lex.WHILE)
-    pars.BoolExpr()
-    CondPC = gen.PC
+    BoolExpr()
+    local CondPC = gen.PC
     Skip(Lex.DO)
     StatSeq()
     Skip(Lex.END)
     gen.Cmd(WhilePC)
     gen.Cmd(ovm.GOTO)
-    -- # ovm.M[CondPC-2] = gen.PC
     gen.fixup(CondPC, gen.PC)
 end
 
