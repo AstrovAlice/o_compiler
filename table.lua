@@ -4,20 +4,20 @@ local Table = {
 }
 
 --imports
-local items = require("items")
+local Items = require("Items")
 local ErrorUnit = require("ErrorUnit")
 
 
 --function for Table only
-function OpenScope()
-    Table._table.append({})
+function Table.OpenScope()
+    table.insert(Table._table, {})
 end
 
-function CloseScope()
+function Table.CloseScope()
     Table._table.pop()
 end
 
-function Add(item)
+function Table.Add(item)
     local last = Table._table[#Table._table]
     last[item.name] = item
 end
@@ -28,25 +28,25 @@ function Table.New(item)
     if item.name ~= last then
         ErrorUnit.CtxError("secend initialising of this name")
     else
-        Add(item)
+        Table.Add(item)
     end
 end
 
-function Table.find(name)
+function Table.Find(name)
     for i = #Table._table, 1, -1 do
         local block = Table._table[i]
         if block[name] then
             return block[name]
         end
     end
-    error("non declared name")
+    -- error("non declared name")
 end
 
 function Table.GetVars()
     local vars = {}
     local lastBlock = Table._table[#Table._table]
     for item in lastBlock.values() do
-        if type(item) == items.Var then
+        if type(item) == Items.Var then
             vars.append(item)
         end
     end

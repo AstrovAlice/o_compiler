@@ -2,8 +2,7 @@ MODULE Primes;
 IMPORT
    Out, In;
 VAR
-   n, c: INTEGER;
-CONST
-   w = 3;
-
-END Primes.
+   n: INTEGER;
+BEGIN
+   n := 1;
+END Primes

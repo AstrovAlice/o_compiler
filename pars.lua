@@ -5,7 +5,7 @@ local ErrorUnit = require("ErrorUnit")
 local Lex = require("Lexemes")
 
 local Table = require("Table")
-local items = require("items")
+local Items = require("Items")
 local gen = require("gen")
 local ovm = require("ovm")
 
@@ -65,13 +65,13 @@ function ConstExpr()
         scan.NextLex()
         return value
     elseif scan.lex == Lex.NAME then
-        -- local x = table.find(scan.name)
-        -- scan.NextLex()
-        -- if type(x) ~= items.Const then
-        --     ErrorUnit.Expect("const")
-        -- else
-        --     return x.value * sign
-        -- end
+        local x = Table.Find(scan.name)
+        scan.NextLex()
+        if type(x) ~= Items.Const then
+            ErrorUnit.Expect("const")
+        else
+            return x.value * sign
+        end
     else
         ErrorUnit.Expect("number or name")
     end
@@ -83,26 +83,26 @@ function ConstDecl()
     scan.NextLex()
     Skip(Lex.EQ)
     local value = ConstExpr()
-    -- table.new(items.Const(name, Types.Int, value))
+    Table.New(Items.Const(name, Types.Int, value))
 end
 
 function Type()
     Check(Lex.NAME)
-    -- x = table.find(scan.name)
-    -- if type(x) ~= items.Type then
-    --     ErrorUnit.Expect("name of type")
-    -- end
+    local x = Table.Find(scan.name)
+    if type(x) ~= Items.Type then
+        ErrorUnit.Expect("name of type")
+    end
     scan.NextLex()
 end
 
 function VarDecl()
     Check(Lex.NAME)
-    -- table.new(items.Var(scan.name, Types.Int))
+    -- Table.New(Items.Var(scan.name, Types.Int))
     scan.NextLex()
     while scan.lex == Lex.COMMA do
         scan.NextLex()
         Check(Lex.NAME)
-        -- table.new(items.Var(scan.name, Types.Int))
+        -- Table.New(Items.Var(scan.name, Types.Int))
         scan.NextLex()
     end
     Skip(Lex.COLON)
@@ -170,17 +170,17 @@ function IfStatement()
 end
 
 function WhileStatement()
-    -- WhilePC = gen.PC
-    -- Skip(Lex.WHILE)
-    -- BoolExpr()
-    -- CondPC = gen.PC
-    -- skip(Lex.DO)
-    -- StatSeq()
-    -- skip(Lex.END)
-    -- gen.Cmd(WhilePC)
-    -- gen.Cmd(cm.GOTO)
+    WhilePC = gen.PC
+    Skip(Lex.WHILE)
+    pars.BoolExpr()
+    CondPC = gen.PC
+    Skip(Lex.DO)
+    StatSeq()
+    Skip(Lex.END)
+    gen.Cmd(WhilePC)
+    gen.Cmd(ovm.GOTO)
     -- # ovm.M[CondPC-2] = gen.PC
-    -- gen.fixup(CondPC, gen.PC)
+    gen.fixup(CondPC, gen.PC)
 end
 
 function Statement()
@@ -204,8 +204,8 @@ end
 function Module()
     Skip(Lex.MODULE)
     if scan.lex == Lex.NAME then
-        -- local module = scan.name
-        -- Table.new(items.Module(module))
+        local module = scan.name
+        -- Table.New(Items.Module(module))
         scan.NextLex()
     else
         ErrorUnit.Expect("name")
@@ -220,14 +220,14 @@ function Module()
         StatSeq()
     end
     Skip(Lex.END)
-    -- Check(Lex.NAME)
-    Skip(Lex.NAME)
-    Skip(Lex.DOT)
+    Check(Lex.NAME)
+    -- Skip(Lex.NAME)
+    -- Skip(Lex.DOT)
 
     -- scan.NextLex()
     -- Skip(Lex.DOT)
 
-    -- x = Table.find(scan.name)
+    -- local x = Table.find(scan.name)
     -- if type(x) != items.Module:
     --     error.expect("имя модуля")
     -- elif x.name != module:  
@@ -242,27 +242,27 @@ function pars.Compile()
     text.NextCh()
     scan.name = text.ch
     scan.NextLex()
-    -- Table.openScope()
+    Table.OpenScope()
 
     T = Types
 
-    -- Table.add(items.Func("abs", T.Int))
-    -- Table.add(items.Func("max", T.Int))
-    -- Table.add(items.Func("min", T.Int))
-    -- Table.add(items.Func("odd", T.Bool))
-    -- Table.add(items.Proc("halt"))
-    -- Table.add(items.Proc("inc"))
-    -- Table.add(items.Proc("dec"))
-    -- Table.add(items.Proc("In.open"))
-    -- Table.add(items.Proc("In.int"))
-    -- Table.add(items.Proc("Out.int"))
-    -- Table.add(items.Proc("Out.ln"))
-    -- Table.add(items.Type("int", T.Int))
+    Table.Add(Items.Func:new("ABS", T.Int))
+    Table.Add(Items.Func:new("MAX", T.Int))
+    Table.Add(Items.Func:new("MIN", T.Int))
+    Table.Add(Items.Func:new("ODD", T.Bool))
+    Table.Add(Items.Proc:new("HALT"))
+    Table.Add(Items.Proc:new("INC"))
+    Table.Add(Items.Proc:new("DEC"))
+    Table.Add(Items.Proc:new("In.Open"))
+    Table.Add(Items.Proc:new("In.Int"))
+    Table.Add(Items.Proc:new("Out.Int"))
+    Table.Add(Items.Proc:new("Out.Ln"))
+    Table.Add(Items.Type:new("INTEGER", T.Int))
 
-    -- Table.openScope()
+    Table.OpenScope()
     Module()
-    -- Table.closeScope()
-    -- Table.closeScope()
+    Table.CloseScope()
+    Table.CloseScope()
     print("\n")
 end
 

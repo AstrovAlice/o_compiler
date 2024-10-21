@@ -1,88 +1,106 @@
 --items
+local Items = {}
 
-local items = {
+Items.Module = {}
+function Items.Module:new(OBJname)
+    assert(type(OBJname) == "string")
+    local obj= {
+        name = OBJname
+    }
+    setmetatable(obj, self)
+    self.__index = self; return obj
+end
 
-}
 
--- Module = {}
--- Module.__index = Module
+Items.Const = {}
+function Items.Const:new(OBJname, OBJtype, OBJvalue)
+    assert(type(OBJname) == "string")
+    local obj= {
+        name = OBJname,
+        type = OBJtype,
+        value = OBJvalue
+    }
+    setmetatable(obj, self)
+    self.__index = self; return obj
+end
 
--- function Module:new(name)
---     assert(type(name) == "string")
---     local obj = setmetatable({}, Module)
---     obj.name = name
---     return obj
+
+Items.Var = {}
+function Items.Var:new(OBJname, OBJtype)
+    assert(type(OBJname) == "string")
+    local obj= {
+        name = OBJname,
+        type = OBJtype
+    }
+    setmetatable(obj, self)
+    self.__index = self; return obj
+end
+
+
+Items.Type = {}
+function Items.Type:new(OBJname, OBJtype)
+    assert(type(OBJname) == "string")
+    local obj= {
+        name = OBJname,
+        type = OBJtype
+    }
+    setmetatable(obj, self)
+    self.__index = self; return obj
+end
+
+
+Items.Func = {}
+function Items.Func:new(OBJname, OBJtype)
+    assert(type(OBJname) == "string")
+    local obj= {
+        name = OBJname,
+        type = OBJtype
+    }
+    setmetatable(obj, self)
+    self.__index = self; return obj
+end
+
+
+Items.Proc = {}
+function Items.Proc:new(OBJname)
+    assert(type(OBJname) == "string")
+    local obj= {
+        name = OBJname
+    }
+    setmetatable(obj, self)
+    self.__index = self; return obj
+end
+
+return Items
+
+--пример из интернета: 
+--https://habr.com/ru/articles/259265/
+
+-- --класс
+-- Person= {}
+-- --тело класса
+-- function Person:new(fName, lName)
+
+--     -- свойства
+--     local obj= {}
+--         obj.firstName = fName
+--         obj.lastName = lName
+
+--     -- метод
+--     function obj:getName()
+--         return self.firstName 
+--     end
+
+--     --чистая магия!
+--     setmetatable(obj, self)
+--     self.__index = self; return obj
 -- end
 
--- -- Определяем класс Const
--- Const = {}
--- Const.__index = Const
+-- --создаем экземпляр класса
+-- vasya = Person:new("Вася", "Пупкин")
 
--- function Const:new(name, typ, value)
---     assert(type(name) == "string")
---     local obj = setmetatable({}, Const)
---     obj.name = name
---     obj.typ = typ
---     obj.value = value
---     return obj
--- end
+-- --обращаемся к свойству
+-- print(vasya.firstName)    --> результат: Вася
 
--- -- Определяем класс Var
--- Var = {}
--- Var.__index = Var
-
--- function Var:new(name, typ)
---     assert(type(name) == "string")
---     local obj = setmetatable({}, Var)
---     obj.name = name
---     obj.typ = typ
---     obj.lastUse = 0
---     return obj
--- end
-
--- -- Определяем класс Type
--- Type = {}
--- Type.__index = Type
-
--- function Type:new(name, typ)
---     assert(type(name) == "string")
---     local obj = setmetatable({}, Type)
---     obj.name = name
---     obj.typ = typ
---     return obj
--- end
-
--- -- Определяем класс Func
--- Func = {}
--- Func.__index = Func
-
--- function Func:new(name, typ)
---     assert(type(name) == "string")
---     local obj = setmetatable({}, Func)
---     obj.name = name
---     obj.typ = typ
---     return obj
--- end
-
--- -- Определяем класс Proc
--- Proc = {}
--- Proc.__index = Proc
-
--- function Proc:new(name)
---     assert(type(name) == "string")
---     local obj = setmetatable({}, Proc)
---     obj.name = name
---     return obj
--- end
-
--- -- Определяем класс ShortVar
--- ShortVar = {}
--- ShortVar.__index = ShortVar
-
--- function ShortVar:new(name)
---     local obj = setmetatable({}, ShortVar)
---     obj.name = name
---     return obj
--- end
-
-return items
+-- --обращаемся к методу
+-- print(vasya:getName())  --> результат: Вася
