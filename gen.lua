@@ -18,7 +18,7 @@ function gen.Const(c)
     -- end
 end
 
-function Addr(v)
+function gen.Addr(v)
     gen.Cmd(v.lastUse)
     v.lastUse = gen.PC + 1
 end

@@ -127,25 +127,108 @@ function DeclSeq()
     end
 end
 
+function SimpleExpression()
+--     if scan.lex in {Lex.PLUS, Lex.MINUS}:
+--         op = scan.lex
+--         nextLex()
+--         T = Term()
+--         TestInt(T)
+--         if op == Lex.MINUS:
+--             gen.Cmd(cm.NEG)
+--     else:
+--         T = Term()
+--     while scan.lex in {Lex.PLUS, Lex.MINUS}:
+--         op = scan.lex
+--         TestInt(T)
+--         nextLex()
+--         T = Term()
+--         TestInt(T)
+--         if op == Lex.PLUS:
+--             gen.Cmd(cm.ADD)
+--         else:
+--             gen.Cmd(cm.SUB)
+    return T
+end
+
+function TestInt(T)
+    if T ~= Types.Int then
+        ErrorUnit.Expect("выражение целого типа")
+    end
+end
+
+function Expression()
+    local T = SimpleExpression()
+    if scan.lex == Lex.EQ or scan.lex ==  Lex.NE or
+    scan.lex == Lex.GT or  scan.lex == Lex.GE or
+    scan.lex == Lex.LT or scan.lex == Lex.LE then
+        local op = scan.lex
+        TestInt(T)
+        scan.NextLex()
+        T = SimpleExpression()
+        TestInt(T)
+        gen.Comp(op)
+        return pars.Types.Bool
+    else
+        return T
+    end
+end
+
+function AssStatement(x)
+    -- gen.Addr(x)
+    Skip(Lex.NAME)
+    Skip(Lex.ASS)
+    local T = Expression()
+    print(type(x.type)..type(T))
+    if x.type ~= T then
+        ErrorUnit.ctxError("Несоответсвие типов при присваивании")
+    end
+    gen.Cmd(ovm.SAVE)
+end
+
+-- def CallStatement(x):
+--     # x - процедура или модуль
+--     skip(Lex.NAME)
+--     if scan.lex == Lex.DOT:
+--         if type(x) != items.Module:
+--             error.expect("имя модуля слева от точки")
+--         nextLex()
+--         check(Lex.NAME)
+--         key = x.name + '.' + scan.name
+--         x = table.find(key)
+--         if type(x) != items.Proc:
+--             error.expect("процедура")
+--         nextLex()
+--     elif type(x) != items.Proc:
+--         error.expect("имя процедуры")
+
+--     if scan.lex == Lex.LPAR:
+--         nextLex()
+--         Procedure(x)
+--         skip(Lex.RPAR)
+--     elif x.name == "Out.Ln":
+--         gen.Cmd(cm.LN)
+--     elif x.name not in {"Out.Ln", "In.Open"}:
+--         error.expect("Out.Ln или In.Open")
+
 function AssOrCall()
     Check(Lex.NAME)
     x = Table.Find(scan.name)
-    if type(x) == items.Var then
-        --AssStatement(x)
+    if type(x) == type(Items.Var) then
+        AssStatement(x)
     elseif type(x) == Items.Proc or type(x) == Items.Module then
-        --CallStatement(x)
+        CallStatement(x)
     else
         ErrorUnit.Expect("name of function or variable")
     end
 end
 
 function IfStatement()
-    -- Skip(Lex.IF)
+    Skip(Lex.IF)
     -- BoolExpr()
-    -- CondPC = gen.PC
-    -- LastGOTO = 0
-    -- skip(Lex.THEN)
-    -- StatSeq()
+    CondPC = gen.PC
+    LastGOTO = 0
+    Skip(Lex.THEN)
+    StatSeq()
     -- while scan.lex == Lex.ELSIF:
     --     gen.Cmd(LastGOTO)
     --     gen.Cmd(cm.GOTO)

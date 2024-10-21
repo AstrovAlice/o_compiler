@@ -99,7 +99,7 @@ function scan.scanNumber()
         if scan.value > scan.MAXINT then
             error(string.format("слишком большое число, максимум %d", scan.MAXINT))
         end
-        text.NextChar()
+        text.NextCh()
     end
     return Lex.NUM
 end
@@ -142,7 +142,7 @@ function scan.NextLex()
         text.NextCh()
         if text.ch == "=" then
             text.NextCh()
-            scan.lex = Lex.ASSIGN
+            scan.lex = Lex.ASS
         else
             scan.lex = Lex.COLON
         end
