@@ -44,14 +44,14 @@ function Table.Find(name)
 end
 
 function Table.GetVars()
-    local vars = {}
-    local lastBlock = Table._table[#Table._table]
-    for item in lastBlock.values() do
-        if type(item) == Items.Var then
-            vars.append(item)
-        end
-    end
-    return vars
+    -- local vars = {} плохо работает
+    -- local lastBlock = Table._table[#Table._table]
+    -- for item = 1, #lastBlock.values() do
+    --     if type(item) == Items.Var then
+    --         vars.append(item)
+    --     end
+    -- end
+    -- return vars
 end
 
 return Table

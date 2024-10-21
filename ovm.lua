@@ -71,155 +71,113 @@ function ovm.PrintCode(PC)
     end
 end
 
+function GetInput()
+    io.write("? ")
+    return tonumber(io.read())
+end
 
 function ovm.Run()
-    -- print("ovm.Run()")
-    --     ovm.PC = 0
-    -- SP = MEM_SIZE
-    -- cnt = 0
-    -- while true do
-    --     local cnt += 1
-    --     cmd = M[PC]
-    --     PC = PC + 1
-    --     if cmd >= 0:
-    --         SP -= 1
-    --         M[SP] = cmd
-    --     elif cmd == ADD:
-    --         SP += 1
-    --         M[SP] = M[SP] + M[SP - 1]
-    --     elif cmd == SUB:
-    --         SP += 1
-    --         M[SP] = M[SP] - M[SP - 1]
-    --     elif cmd == MULT:
-    --         SP += 1
-    --         M[SP] = M[SP] * M[SP - 1]
-    --     elif cmd == DIV:
-    --         SP += 1
-    --         M[SP] = M[SP] // M[SP - 1]
-    --     elif cmd == MOD:
-    --         SP += 1
-    --         M[SP] = M[SP] % M[SP - 1]
-    --     elif cmd == NEG:
-    --         M[SP] = -M[SP]
-    --     elif cmd == LOAD:
-    --         M[SP] = M[M[SP]]
-    --     elif cmd == SAVE:
-    --         M[M[SP + 1]] = M[SP]
-    --         SP += 2
-    --     elif cmd == DUP:
-    --         M[SP - 1] = M[SP]
-    --         SP -= 1
-    --     elif cmd == DROP:
-    --         SP += 1
-    --     elif cmd == SWAP:
-    --         temp = M[SP]
-    --         M[SP] = M[SP + 1]
-    --         M[SP + 1] = temp
-    --     elif cmd == OVER:
-    --         SP -= 1
-    --         M[SP] = M[SP + 2]
-    --     elif cmd == GOTO:
-    --         PC = M[SP]
-    --         SP += 1
-    --     elif cmd == IFEQ:
-    --         if M[SP + 2] == M[SP + 1]:
-    --             PC = M[SP]
-    --         SP += 3
-    --     elif cmd == IFNE:
-    --         if M[SP + 2] != M[SP + 1]:
-    --             PC = M[SP]
-    --         SP += 3
-    --     elif cmd == IFLT:
-    --         if M[SP + 2] < M[SP + 1]:
-    --             PC = M[SP]
-    --         SP += 3
-    --     elif cmd == IFLE:
-    --         if M[SP + 2] <= M[SP + 1]:
-    --             PC = M[SP]
-    --         SP += 3
-    --     elif cmd == IFGT:
-    --         if M[SP + 2] > M[SP + 1]:
-    --             PC = M[SP]
-    --         SP += 3
-    --     elif cmd == IFGE:
-    --         if M[SP + 2] >= M[SP + 1]:
-    --             PC = M[SP]
-    --         SP += 3
-    --     elif cmd == IN:
-    --         SP -= 1
-    --         try:
-    --             M[SP] = int(input("?"))
-    --         except:
-    --             error.Error("Неправильный ввод")
-    --     elif cmd == OUT:
-    --         print(f"{M[SP + 1]:{M[SP]}}", end="")
-    --         SP += 2
-    --     elif cmd == LN:
-    --         print()
-    --     elif cmd == STOP:
-    --         break
-    --     else:
-    --         error.Error("Недопустимая команда")
+    local PC = 1
+    local SP = ovm.MEM_SIZE
+    local cnt = 0
+    local M = ovm.M
+
+    local cmd = 0
+
+    while true do
+        cnt = cnt + 1
+        cmd = ovm.M[PC]
+        PC = PC + 1
+        if cmd >= 0 then
+            SP = SP - 1
+            M[SP] = cmd
+        elseif cmd == ovm.ADD then
+            SP = SP + 1
+            M[SP] = M[SP] + M[SP - 1]
+        elseif cmd == ovm.SUB then
+            SP = SP + 1
+            M[SP] = M[SP] - M[SP - 1]
+        elseif cmd == ovm.MULT then
+            SP = SP + 1
+            M[SP] = M[SP] * M[SP - 1]
+        elseif cmd == ovm.DIV then
+            SP = SP + 1
+            M[SP] = M[SP] // M[SP - 1]
+        elseif cmd == ovm.MOD then
+            SP = SP + 1
+            M[SP] = M[SP] % M[SP - 1]
+        elseif cmd == ovm.NEG then
+            M[SP] = -M[SP]
+        elseif cmd == ovm.LOAD then
+            M[SP] = M[M[SP]]
+        elseif cmd == ovm.SAVE then
+            M[M[SP + 1]] = M[SP]
+            SP = SP + 2
+        elseif cmd == ovm.DUP then
+            M[SP - 1] = M[SP]
+            SP = SP - 1
+        elseif cmd == ovm.DROP then
+            SP = SP + 1
+        elseif cmd == ovm.SWAP then
+            local temp = M[SP]
+            M[SP] = M[SP + 1]
+            M[SP + 1] = temp
+        elseif cmd == ovm.OVER then
+            SP = SP - 1
+            M[SP] = M[SP + 2]
+        elseif cmd == ovm.GOTO then
+            PC = M[SP]
+            SP = SP + 1
+        elseif cmd == ovm.IFEQ then
+            if M[SP + 2] == M[SP + 1] then
+                PC = M[SP]
+            end
+            SP = SP + 3
+        elseif cmd == ovm.IFNE then
+            if M[SP + 2] ~= M[SP + 1] then
+                PC = M[SP]
+            end
+            SP = SP + 3
+        elseif cmd == ovm.IFLT then
+            if M[SP + 2] < M[SP + 1]then
+                PC = M[SP]
+            end
+            SP = SP + 3
+        elseif cmd == ovm.IFLE then
+            if M[SP + 2] <= M[SP + 1] then
+                PC = M[SP]
+            end
+            SP = SP + 3
+        elseif cmd == ovm.IFGT then
+            if M[SP + 2] > M[SP + 1] then
+                PC = M[SP]
+            end
+            SP = SP + 3
+        elseif cmd == ovm.IFGE then
+            if M[SP + 2] >= M[SP + 1] then
+                PC = M[SP]
+            end
+            SP = SP + 3
+        elseif cmd == ovm.IN then
+            SP = SP - 1
+            local success, result = pcall(GetInput)
+            if success then
+                M[SP] = result
+            else
+                ErrorUnit.Error("Неправильный ввод")
+            end
+        elseif cmd == ovm.OUT then
+            io.write(string.format("%" .. M[SP] .. "s", M[SP + 1]))
+            SP = SP + 2
+        elseif cmd == ovm.LN then
+            print()
+        elseif cmd == ovm.STOP then
+            break
+        else
+            ErrorUnit.Error("command is not available")
+        end
+    end
 end
 
 
 return ovm
-
--- # Виртуальная машина
-
--- import error
-
--- STOP = -1
--- ADD = -2
--- SUB = -3
--- MULT = -4
--- DIV = -5
--- MOD = -6
--- NEG = -7
--- LOAD = -8
--- SAVE = -9
--- DUP = -10
--- DROP = -11
--- SWAP = -12
--- OVER = -13
--- GOTO = -14
--- IFLT = -15
--- IFLE = -16
--- IFGT = -17
--- IFGE = -18
--- IFEQ = -19
--- IFNE = -20
--- IN = -21
--- OUT = -22
--- LN = -23
-
--- MEM_SIZE = 8 * 1024
-
--- M = [STOP] * MEM_SIZE
-
--- _mnemo = [
---     "",
---     "STOP",
---     "ADD",
---     "SUB",
---     "MULT",
---     "DIV",
---     "MOD",
---     "NEG",
---     "LOAD",
---     "SAVE",
---     "DUP",
---     "DROP",
---     "SWAP",
---     "OVER",
---     "GOTO",
---     "IFLT",
---     "IFLE",
---     "IFGT",
---     "IFGE",
---     "IFEQ",
---     "IFNE",
---     "IN",
---     "OUT",
---     "LN"
--- ]

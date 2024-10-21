@@ -278,6 +278,16 @@ function AssStatement(x)
     gen.Cmd(ovm.SAVE)
 end
 
+function Variable()
+    Check(Lex.NAME)
+    v = Table.Find(scan.name)
+    if type(v) ~= Items.Var then
+        ErrorUnit.Expect("имя переменной")
+    end
+    gen.Addr(v)
+    scan.NextLex()
+end
+
 function Procedure(x)
     if x.name == "HALT" then
         local value = ConstExpr()
@@ -336,7 +346,7 @@ function CallStatement(x)
         local key = x.name + '.' + scan.name
         x = Table.Find(key)
         if type(x) ~= Items.Proc then
-            ErrorUnit.Expect("процедура")
+            ErrorUnit.Expect("procedure")
         end
         scan.NextLex()
     elseif type(x) ~= Items.Proc then
@@ -347,7 +357,7 @@ function CallStatement(x)
         Procedure(x)
         Skip(Lex.RPAR)
     elseif x.name == "Out.Ln" then
-        gen.Cmd(cm.LN)
+        gen.Cmd(ovm.LN)
     elseif x.name ~= "Out.Ln" or x.name ~= "In.Open" then
         ErrorUnit.Expect("Out.Ln или In.Open")
     end
@@ -459,26 +469,26 @@ function Module()
     end
     Skip(Lex.END)
     Check(Lex.NAME)
-    local x = Table.Find(scan.name)
-    if type(x) ~= Items.Module then
-        ErrorUnit.Expect("имя модуля")
-    elseif x.name ~= module then
-        ErrorUnit.Expect("имя модуля "..module)
-    end
+    -- local x = Table.Find(scan.name)
+    -- if x.name ~= Items.Module then
+    --     ErrorUnit.Expect("other module name")
+    -- elseif x.name ~= module.name then
+    --     ErrorUnit.Expect("module name "..module)
+    -- end
     scan.NextLex()
-    Skip(Lex.DOT)
+    -- Skip(Lex.DOT)
     gen.Cmd(ovm.STOP)
-    AllocVars()
+    -- AllocVars() плохо работает
 end
 
 function AllocVars()
-    local vars = Table.getVars()
+    local vars = Table.GetVars()
     for v = 1, #vars do
         if vars[v].lastUse > 0 then
             gen.fixup(vars[v].lastUse, gen.PC)
             gen.Cmd(0)
         else
-            ErrorUnit.Warning("Переменная "..vars[v].name.." объявлена, но не используется")
+            ErrorUnit.Warning("variable "..vars[v].name.." объявлена, но не используется")
         end
     end
 end
