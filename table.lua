@@ -14,7 +14,8 @@ function Table.OpenScope()
 end
 
 function Table.CloseScope()
-    Table._table.pop()
+    -- Table._table.pop()
+    table.remove(Table._table, #Table._table)
 end
 
 function Table.Add(item)

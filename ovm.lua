@@ -1,14 +1,74 @@
 --ovm
-local ovm = {}
+local ovm = {
+    MEM_SIZE = 8 * 1024,
+
+    STOP = -1,
+    ADD = -2,
+    SUB = -3,
+    MULT = -4,
+    DIV = -5,
+    MOD = -6,
+    NEG = -7,
+    LOAD = -8,
+    SAVE = -9,
+    DUP = -10,
+    DROP = -11,
+    SWAP = -12,
+    OVER = -13,
+    GOTO = -14,
+    IFLT = -15,
+    IFLE = -16,
+    IFGT = -17,
+    IFGE = -18,
+    IFEQ = -19,
+    IFNE = -20,
+    IN = -21,
+    OUT = -22,
+    LN = -23,
+    _mnemo = {
+        [1]="",
+        [2]="STOP",
+        [3]="ADD",
+        [4]="SUB",
+        [5]="MULT",
+        [6]="DIV",
+        [7]="MOD",
+        [8]="NEG",
+        [9]="LOAD",
+        [10]="SAVE",
+        [11]="DUP",
+        [12]="DROP",
+        [13]="SWAP",
+        [14]="OVER",
+        [15]="GOTO",
+        [16]="IFLT",
+        [17]="IFLE",
+        [18]="IFGT",
+        [19]="IFGE",
+        [20]="IFEQ",
+        [21]="IFNE",
+        [22]="IN",
+        [23]="OUT",
+        [24]="LN"
+    }
+}
 --imports
 local ErrorUnit = require("ErrorUnit")
 
 ovm.PC = 0
+ovm.M = {}
+for i = 1, ovm.MEM_SIZE do
+    ovm.M[i] = ovm.STOP
+end
 
-function ovm.PrintCode(code)
-    print("ovm.PrintCode("..code..")")
-    -- for pc in range(0, PC):
-    -- print(pc, ') ', M[pc] if M[pc] >= 0 else _mnemo[-M[pc]])
+function ovm.PrintCode(PC)
+    for pc = 1, PC do
+        if ovm.M[pc] >= 0 then
+            print(pc..") "..ovm.M[pc])
+        else 
+            print(ovm._mnemo[-ovm.M[pc]])
+        end
+    end
 end
 
 

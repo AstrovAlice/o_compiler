@@ -278,30 +278,80 @@ function AssStatement(x)
     gen.Cmd(ovm.SAVE)
 end
 
--- def CallStatement(x):
---     # x - процедура или модуль
---     skip(Lex.NAME)
---     if scan.lex == Lex.DOT:
---         if type(x) != items.Module:
---             error.expect("имя модуля слева от точки")
---         nextLex()
---         check(Lex.NAME)
---         key = x.name + '.' + scan.name
---         x = table.find(key)
---         if type(x) != items.Proc:
---             error.expect("процедура")
---         nextLex()
---     elif type(x) != items.Proc:
---         error.expect("имя процедуры")
+function Procedure(x)
+    if x.name == "HALT" then
+        local value = ConstExpr()
+        gen.Const(value)
+        gen.Cmd(ovm.STOP)
+    elseif x.name == "INC" then
+        Variable()
+        gen.Cmd(ovm.DUP)
+        gen.Cmd(ovm.LOAD)
+        if scan.lex == Lex.COMMA then
+            scan.NextLex()
+            IntExpr()
+        else
+            gen.Cmd(1)
+        gen.Cmd(ovm.ADD)
+        gen.Cmd(ovm.SAVE)
+        end
+    elseif x.name == "DEC"then
+        Variable()
+        gen.Cmd(ovm.DUP)
+        gen.Cmd(ovm.LOAD)
+        if scan.lex == Lex.COMMA then
+            scan.NextLex()
+            IntExpr()
+        else
+            gen.Cmd(1)
+        end
+        gen.Cmd(ovm.SUB)
+        gen.Cmd(ovm.SAVE)
+    elseif x.name == "In.Open" then
+        io.write()--pass
+    elseif x.name == "In.Int" then
+        Variable()
+        gen.Cmd(ovm.IN)
+        gen.Cmd(ovm.SAVE)
+    elseif x.name == "Out.Int" then
+        IntExpr()
+        Skip(Lex.COMMA)
+        IntExpr()
+        gen.Cmd(ovm.OUT)
+    elseif x.name == "Out.Ln" then
+        gen.Cmd(ovm.LN)
+    else
+        aassert(false, "Unknown function: " .. x.name)
+    end
+end
 
---     if scan.lex == Lex.LPAR:
---         nextLex()
---         Procedure(x)
---         skip(Lex.RPAR)
---     elif x.name == "Out.Ln":
---         gen.Cmd(cm.LN)
---     elif x.name not in {"Out.Ln", "In.Open"}:
---         error.expect("Out.Ln или In.Open")
+function CallStatement(x)
+    Skip(Lex.NAME)
+    if scan.lex == Lex.DOT then
+        if type(x) ~= Items.Module then
+            ErrorUnit.Expect("name of module before dot")
+        end
+        scan.NextLex()
+        Check(Lex.NAME)
+        local key = x.name + '.' + scan.name
+        x = Table.Find(key)
+        if type(x) ~= Items.Proc then
+            ErrorUnit.Expect("процедура")
+        end
+        scan.NextLex()
+    elseif type(x) ~= Items.Proc then
+        ErrorUnit.Expect("procedure name")
+    end
+    if scan.lex == Lex.LPAR then
+        scan.NextLex()
+        Procedure(x)
+        Skip(Lex.RPAR)
+    elseif x.name == "Out.Ln" then
+        gen.Cmd(cm.LN)
+    elseif x.name ~= "Out.Ln" or x.name ~= "In.Open" then
+        ErrorUnit.Expect("Out.Ln или In.Open")
+    end
+end
 
 function AssOrCall()
     Check(Lex.NAME)
@@ -324,7 +374,7 @@ function IfStatement()
     StatSeq()
     while scan.lex == Lex.ELSIF do
         gen.Cmd(LastGOTO)
-        gen.Cmd(cm.GOTO)
+        gen.Cmd(ovm.GOTO)
         LastGOTO = gen.PC
         gen.fixup(CondPC, gen.PC)
         scan.NextLex()
@@ -335,7 +385,7 @@ function IfStatement()
     end
     if scan.lex == Lex.ELSE then
         gen.Cmd(LastGOTO)
-        gen.Cmd(cm.GOTO)
+        gen.Cmd(ovm.GOTO)
         LastGOTO = gen.PC
         gen.fixup(CondPC, gen.PC)
         scan.NextLex()
@@ -409,15 +459,28 @@ function Module()
     end
     Skip(Lex.END)
     Check(Lex.NAME)
-    -- local x = Table.find(scan.name)
-    -- if type(x) != items.Module:
-    --     error.expect("имя модуля")
-    -- elif x.name != module:  
-    --     error.expect("имя модуля " + module)
-    -- nextLex()
-    -- skip(Lex.DOT)
-    -- gen.Cmd(cm.STOP)
-    -- AllocVars()
+    local x = Table.Find(scan.name)
+    if type(x) ~= Items.Module then
+        ErrorUnit.Expect("имя модуля")
+    elseif x.name ~= module then
+        ErrorUnit.Expect("имя модуля "..module)
+    end
+    scan.NextLex()
+    Skip(Lex.DOT)
+    gen.Cmd(ovm.STOP)
+    AllocVars()
+end
+
+function AllocVars()
+    local vars = Table.getVars()
+    for v = 1, #vars do
+        if vars[v].lastUse > 0 then
+            gen.fixup(vars[v].lastUse, gen.PC)
+            gen.Cmd(0)
+        else
+            ErrorUnit.Warning("Переменная "..vars[v].name.." объявлена, но не используется")
+        end
+    end
 end
 
 function pars.Compile()
