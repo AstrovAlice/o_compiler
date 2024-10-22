@@ -5,6 +5,8 @@ Items.Module = {}
 function Items.Module:new(OBJname)
     assert(type(OBJname) == "string")
     local obj= {
+        item = "Module",
+        --поля:
         name = OBJname
     }
     setmetatable(obj, self)
@@ -16,6 +18,8 @@ Items.Const = {}
 function Items.Const:new(OBJname, OBJtype, OBJvalue)
     assert(type(OBJname) == "string")
     local obj= {
+        item = "Const",
+        --поля:
         name = OBJname,
         type = OBJtype,
         value = OBJvalue
@@ -29,6 +33,8 @@ Items.Var = {}
 function Items.Var:new(OBJname, OBJtype)
     assert(type(OBJname) == "string")
     local obj= {
+        item = "Var",
+        --поля:
         name = OBJname,
         type = OBJtype
     }
@@ -41,6 +47,8 @@ Items.Type = {}
 function Items.Type:new(OBJname, OBJtype)
     assert(type(OBJname) == "string")
     local obj= {
+        item = "Type",
+        --поля:
         name = OBJname,
         type = OBJtype
     }
@@ -53,6 +61,8 @@ Items.Func = {}
 function Items.Func:new(OBJname, OBJtype)
     assert(type(OBJname) == "string")
     local obj= {
+        item = "Func",
+        --поля:
         name = OBJname,
         type = OBJtype
     }
@@ -65,6 +75,8 @@ Items.Proc = {}
 function Items.Proc:new(OBJname)
     assert(type(OBJname) == "string")
     local obj= {
+        item = "Proc",
+        --поля:
         name = OBJname
     }
     setmetatable(obj, self)

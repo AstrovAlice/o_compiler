@@ -2,7 +2,7 @@
 local gen = {}
 --imports
 local ovm = require("ovm")
-local Lex = require("Lexemes").Lex
+local Lex = require("Lexemes")
 
 gen.PC = 0
 
@@ -23,7 +23,7 @@ function gen.Addr(v)
     v.lastUse = gen.PC + 1
 end
 
-function Comp(op)
+function gen.Comp(op)
     gen.Cmd(0)
     if op == Lex.EQ then
         gen.Cmd(ovm.IFNE)
@@ -40,7 +40,7 @@ function Comp(op)
     end
 end
 
-function Fixup(A, PC)
+function gen.Fixup(A, PC)
     while A > 0 do
         local temp = ovm.M[A - 2]
         ovm.M[A - 2] = PC

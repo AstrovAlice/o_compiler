@@ -22,21 +22,21 @@ local lexemes = {
         MOD = "MOD",
         PLUS = "+",
         MINUS = "-",
-        EQ = 20,
-        NE = 21,
-        LT = 22,
-        LE = 23,
-        GT = 24,
-        GE = 25,
+        EQ = "=",
+        NE = "#",
+        LT = "<",
+        LE = "<=",
+        GT = ">",
+        GE = ">=",
         DOT = ".",
         COMMA = ",",
         COLON = ":",
         SEMI = ";",
         ASS = ":=",
         SASS = 31,
-        LPAR = 32,
-        RPAR = 33,
-        EOT = 34
+        LPAR = "(",
+        RPAR = ")",
+        EOT = require('text').chEOT
     }
 }
 

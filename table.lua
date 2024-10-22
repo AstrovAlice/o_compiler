@@ -40,7 +40,7 @@ function Table.Find(name)
             return block[name]
         end
     end
-    -- error("non declared name")
+    error("non declared name")
 end
 
 function Table.GetVars()

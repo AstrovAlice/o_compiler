@@ -37,7 +37,7 @@ function ImportModule()
     if name == "In" or name == "Out" then
         Table.New(Items.Module:new(name))
     else
-        ErrorUnit.CtxError("Предусмотрены только модули In и Out")
+        ErrorUnit.CtxError("you can use only 'In' and 'Out'")
     end
     scan.NextLex()
 end
@@ -67,7 +67,7 @@ function ConstExpr()
     elseif scan.lex == Lex.NAME then
         local x = Table.Find(scan.name)
         scan.NextLex()
-        if type(x) ~= Items.Const then
+        if x.item ~= "Const" then
             ErrorUnit.Expect("const")
         else
             return x.value * sign
@@ -89,7 +89,8 @@ end
 function Type()
     Check(Lex.NAME)
     local x = Table.Find(scan.name)
-    if type(x) ~= type(Items.Type) then
+    -- if type(x) ~= type(Items.Type) then    !!!
+    if x.item ~= "Type" then
         ErrorUnit.Expect("name of type")
     end
     scan.NextLex()
@@ -166,16 +167,16 @@ end
 function Factor()
     if scan.lex == Lex.NAME then
         local x = Table.Find(scan.name)
-        if type(x) == Items.Const then
+        if x.item == "Const" then
             gen.Const(x.value)
             scan.NextLex()
             return x.type
-        elseif type(x) == Items.Var then
+        elseif x.item == "Var" then
             gen.Addr(x)
             gen.Cmd(ovm.LOAD)
             scan.NextLex()
             return x.type
-        elseif type(x) == Items.Func then
+        elseif x.item == "Func" then
             scan.NextLex()
             Skip(Lex.LPAR)
             Function(x)
@@ -261,7 +262,7 @@ function Expression()
         T = SimpleExpression()
         TestInt(T)
         gen.Comp(op)
-        return pars.Types.Bool
+        return Types.Bool
     else
         return T
     end
@@ -280,8 +281,8 @@ end
 
 function Variable()
     Check(Lex.NAME)
-    v = Table.Find(scan.name)
-    if type(v) ~= Items.Var then
+    local v = Table.Find(scan.name)
+    if v.item ~= "Var" then
         ErrorUnit.Expect("имя переменной")
     end
     gen.Addr(v)
@@ -331,25 +332,25 @@ function Procedure(x)
     elseif x.name == "Out.Ln" then
         gen.Cmd(ovm.LN)
     else
-        aassert(false, "Unknown function: " .. x.name)
+        assert(false, "Unknown function: " .. x.name)
     end
 end
 
 function CallStatement(x)
     Skip(Lex.NAME)
     if scan.lex == Lex.DOT then
-        if type(x) ~= Items.Module then
+        if x.item ~= "Module" then
             ErrorUnit.Expect("name of module before dot")
         end
         scan.NextLex()
         Check(Lex.NAME)
-        local key = x.name + '.' + scan.name
+        local key = x.name.."."..scan.name
         x = Table.Find(key)
-        if type(x) ~= Items.Proc then
+        if x.item ~= "Proc" then
             ErrorUnit.Expect("procedure")
         end
         scan.NextLex()
-    elseif type(x) ~= Items.Proc then
+    elseif x.item ~= "Proc" then
         ErrorUnit.Expect("procedure name")
     end
     if scan.lex == Lex.LPAR then
@@ -358,17 +359,22 @@ function CallStatement(x)
         Skip(Lex.RPAR)
     elseif x.name == "Out.Ln" then
         gen.Cmd(ovm.LN)
-    elseif x.name ~= "Out.Ln" or x.name ~= "In.Open" then
-        ErrorUnit.Expect("Out.Ln или In.Open")
+    elseif x.name ~= "Out.Ln" and x.name ~= "In.Open" then
+        ErrorUnit.Expect("Out.Ln or In.Open")
     end
 end
 
 function AssOrCall()
     Check(Lex.NAME)
-    x = Table.Find(scan.name)
-    if type(x) == type(Items.Var) then
+    local x = Table.Find(scan.name)
+    -- print() 
+    -- print("type(x):"..type(x))
+    -- print()
+    -- print("type(Items.Var):"..type(Items.Var)) --отладка
+    -- print()
+    if x.item == "Var" then
         AssStatement(x)
-    elseif type(x) == Items.Proc or type(x) == Items.Module then
+    elseif x.item == "Proc" or x.item == "Module" then
         CallStatement(x)
     else
         ErrorUnit.Expect("name of function or variable")
@@ -397,14 +403,14 @@ function IfStatement()
         gen.Cmd(LastGOTO)
         gen.Cmd(ovm.GOTO)
         LastGOTO = gen.PC
-        gen.fixup(CondPC, gen.PC)
+        gen.Fixup(CondPC, gen.PC)
         scan.NextLex()
         StatSeq()
     else
-        gen.fixup(CondPC, gen.PC)
+        gen.Fixup(CondPC, gen.PC)
     end
     Skip(Lex.END)
-    gen.fixup(LastGOTO, gen.PC)
+    gen.Fixup(LastGOTO, gen.PC)
 end
 
 function TestBool(T)
@@ -428,7 +434,7 @@ function WhileStatement()
     Skip(Lex.END)
     gen.Cmd(WhilePC)
     gen.Cmd(ovm.GOTO)
-    gen.fixup(CondPC, gen.PC)
+    gen.Fixup(CondPC, gen.PC)
 end
 
 function Statement()
@@ -482,7 +488,7 @@ function Module()
 end
 
 function AllocVars()
-    local vars = Table.GetVars()
+    vars = Table.GetVars() --local убран, чтобы глаза подсветка предупреждений не морочила
     for v = 1, #vars do
         if vars[v].lastUse > 0 then
             gen.fixup(vars[v].lastUse, gen.PC)
@@ -512,6 +518,7 @@ function pars.Compile()
     Table.Add(Items.Proc:new("In.Int"))
     Table.Add(Items.Proc:new("Out.Int"))
     Table.Add(Items.Proc:new("Out.Ln"))
+    -- Table.Add(Items.Proc:new("Out.Line")) --сам добавил
     Table.Add(Items.Type:new("INTEGER", T.Int))
 
     Table.OpenScope()

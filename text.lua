@@ -19,7 +19,7 @@ function text.Reset(args)
         ErrorUnit.Error("Запуск: lua O.lua <файл программы>")
     else
         -- Пытаемся открыть файл
-        local file, err = io.open(args[2], "r")
+        file, err = io.open(args[2], "r")--local убран, чтобы глаза подсветка предупреждений не морочила
         if not file then
             ErrorUnit.Error("Ошибка открытия файла: " .. err)
         end

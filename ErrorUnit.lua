@@ -1,12 +1,12 @@
 --ErrorUnit
 
 local loc = require("loc")
--- local text = require("text")
+-- local ch = require("text").ch
 
 local ErrorUnit = {}
 
 function ErrorUnit._error(msg, p)
-    -- while text.ch ~= text.chEOL and text.ch ~= text.chEOT do                                 нет возможности добавить сюда text, тк всё ломается
+    -- while ch ~= chEOL and text.ch ~= text.chEOT do                                 нет возможности добавить сюда text, тк всё ломается
     --     text.NextCh()
     -- end
     print()

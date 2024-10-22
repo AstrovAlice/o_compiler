@@ -164,7 +164,7 @@ function ovm.Run()
             if success then
                 M[SP] = result
             else
-                ErrorUnit.Error("Неправильный ввод")
+                ErrorUnit.Error("input is wrong")
             end
         elseif cmd == ovm.OUT then
             io.write(string.format("%" .. M[SP] .. "s", M[SP + 1]))
