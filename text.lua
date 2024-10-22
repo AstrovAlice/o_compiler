@@ -13,21 +13,21 @@ local text = {
     ch = ""
 }
  
-function text.Reset(args)
+function text.Reset()
     local args = {"", "test\\Prime.o"}
     if #args < 2 then
-        ErrorUnit.Error("Запуск: lua O.lua <файл программы>")
+        ErrorUnit.Error("LOL")
     else
         -- Пытаемся открыть файл
         file, err = io.open(args[2], "r")--local убран, чтобы глаза подсветка предупреждений не морочила
         if not file then
-            ErrorUnit.Error("Ошибка открытия файла: " .. err)
+            ErrorUnit.Error("cant open file: " .. err)
         end
 
         local content, read_err = file:read("*a")
         if not content then
             file:close()
-            ErrorUnit.Error("Ошибка чтения файла: " .. read_err)
+            ErrorUnit.Error("dont read: " .. read_err)
         end
 
         text._src = content

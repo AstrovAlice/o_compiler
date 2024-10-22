@@ -36,7 +36,8 @@ function Items.Var:new(OBJname, OBJtype)
         item = "Var",
         --поля:
         name = OBJname,
-        type = OBJtype
+        type = OBJtype,
+        lastUse = 0
     }
     setmetatable(obj, self)
     self.__index = self; return obj

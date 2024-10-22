@@ -25,6 +25,7 @@ local ovm = {
     IN = -21,
     OUT = -22,
     LN = -23,
+
     _mnemo = {
         [1]="",
         [2]="STOP",
@@ -63,11 +64,12 @@ end
 
 function ovm.PrintCode(PC)
     for pc = 1, PC do
-        if ovm.M[pc] >= 0 then
-            print(pc..") "..ovm.M[pc])
-        else 
-            print(ovm._mnemo[-ovm.M[pc]])
-        end
+        print(ovm.M[pc])
+        -- if ovm.ovm.M[pc] >= 0 then
+        --     print(pc..") "..ovm.ovm.M[pc])
+        -- else 
+        --     print(ovm._mnemo[-ovm.ovm.M[pc]])
+        -- end
     end
 end
 
@@ -77,97 +79,94 @@ function GetInput()
 end
 
 function ovm.Run()
-    local PC = 1
+    local PC = 0
     local SP = ovm.MEM_SIZE
     local cnt = 0
-    local M = ovm.M
-
-    local cmd = 0
 
     while true do
         cnt = cnt + 1
-        cmd = ovm.M[PC]
+        local cmd = ovm.M[PC]
         PC = PC + 1
         if cmd >= 0 then
             SP = SP - 1
-            M[SP] = cmd
+            ovm.M[SP] = cmd
         elseif cmd == ovm.ADD then
             SP = SP + 1
-            M[SP] = M[SP] + M[SP - 1]
+            ovm.M[SP] = ovm.M[SP] + ovm.M[SP - 1]
         elseif cmd == ovm.SUB then
             SP = SP + 1
-            M[SP] = M[SP] - M[SP - 1]
+            ovm.M[SP] = ovm.M[SP] - ovm.M[SP - 1]
         elseif cmd == ovm.MULT then
             SP = SP + 1
-            M[SP] = M[SP] * M[SP - 1]
+            ovm.M[SP] = ovm.M[SP] * ovm.M[SP - 1]
         elseif cmd == ovm.DIV then
             SP = SP + 1
-            M[SP] = M[SP] // M[SP - 1]
+            ovm.M[SP] = ovm.M[SP] // ovm.M[SP - 1]
         elseif cmd == ovm.MOD then
             SP = SP + 1
-            M[SP] = M[SP] % M[SP - 1]
+            ovm.M[SP] = ovm.M[SP] % ovm.M[SP - 1]
         elseif cmd == ovm.NEG then
-            M[SP] = -M[SP]
+            ovm.M[SP] = -ovm.M[SP]
         elseif cmd == ovm.LOAD then
-            M[SP] = M[M[SP]]
+            ovm.M[SP] = ovm.M[ovm.M[SP]]
         elseif cmd == ovm.SAVE then
-            M[M[SP + 1]] = M[SP]
+            ovm.M[ovm.M[SP + 1]] = ovm.M[SP]
             SP = SP + 2
         elseif cmd == ovm.DUP then
-            M[SP - 1] = M[SP]
+            ovm.M[SP - 1] = ovm.M[SP]
             SP = SP - 1
         elseif cmd == ovm.DROP then
             SP = SP + 1
         elseif cmd == ovm.SWAP then
-            local temp = M[SP]
-            M[SP] = M[SP + 1]
-            M[SP + 1] = temp
+            local temp = ovm.M[SP]
+            ovm.M[SP] = ovm.M[SP + 1]
+            ovm.M[SP + 1] = temp
         elseif cmd == ovm.OVER then
             SP = SP - 1
-            M[SP] = M[SP + 2]
+            ovm.M[SP] = ovm.M[SP + 2]
         elseif cmd == ovm.GOTO then
-            PC = M[SP]
+            PC = ovm.M[SP]
             SP = SP + 1
         elseif cmd == ovm.IFEQ then
-            if M[SP + 2] == M[SP + 1] then
-                PC = M[SP]
+            if ovm.M[SP + 2] == ovm.M[SP + 1] then
+                PC = ovm.M[SP]
             end
             SP = SP + 3
         elseif cmd == ovm.IFNE then
-            if M[SP + 2] ~= M[SP + 1] then
-                PC = M[SP]
+            if ovm.M[SP + 2] ~= ovm.M[SP + 1] then
+                PC = ovm.M[SP]
             end
             SP = SP + 3
         elseif cmd == ovm.IFLT then
-            if M[SP + 2] < M[SP + 1]then
-                PC = M[SP]
+            if ovm.M[SP + 2] < ovm.M[SP + 1]then
+                PC = ovm.M[SP]
             end
             SP = SP + 3
         elseif cmd == ovm.IFLE then
-            if M[SP + 2] <= M[SP + 1] then
-                PC = M[SP]
+            if ovm.M[SP + 2] <= ovm.M[SP + 1] then
+                PC = ovm.M[SP]
             end
             SP = SP + 3
         elseif cmd == ovm.IFGT then
-            if M[SP + 2] > M[SP + 1] then
-                PC = M[SP]
+            if ovm.M[SP + 2] > ovm.M[SP + 1] then
+                PC = ovm.M[SP]
             end
             SP = SP + 3
         elseif cmd == ovm.IFGE then
-            if M[SP + 2] >= M[SP + 1] then
-                PC = M[SP]
+            if ovm.M[SP + 2] >= ovm.M[SP + 1] then
+                PC = ovm.M[SP]
             end
             SP = SP + 3
         elseif cmd == ovm.IN then
             SP = SP - 1
             local success, result = pcall(GetInput)
             if success then
-                M[SP] = result
+                ovm.M[SP] = result
             else
                 ErrorUnit.Error("input is wrong")
             end
         elseif cmd == ovm.OUT then
-            io.write(string.format("%" .. M[SP] .. "s", M[SP + 1]))
+            io.write(string.format("%" .. ovm.M[SP] .. "s", ovm.M[SP + 1]))
             SP = SP + 2
         elseif cmd == ovm.LN then
             print()
