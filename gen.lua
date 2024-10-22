@@ -19,8 +19,7 @@ function gen.Const(c)
 end
 
 function gen.Addr(v)
-    gen.Cmd(v.lastUse) --это правильный вариант, но пока не доступный
-    -- gen.Cmd(1)
+    gen.Cmd(v.lastUse)
     v.lastUse = gen.PC + 1
 end
 

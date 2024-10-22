@@ -58,18 +58,17 @@ local ErrorUnit = require("ErrorUnit")
 
 ovm.PC = 0
 ovm.M = {}
-for i = 1, ovm.MEM_SIZE do
+for i = 0, ovm.MEM_SIZE do
     ovm.M[i] = ovm.STOP
 end
 
 function ovm.PrintCode(PC)
     for pc = 1, PC do
-        print(ovm.M[pc])
-        -- if ovm.ovm.M[pc] >= 0 then
-        --     print(pc..") "..ovm.ovm.M[pc])
-        -- else 
-        --     print(ovm._mnemo[-ovm.ovm.M[pc]])
-        -- end
+        if ovm.M[pc] >= 0 then
+            print(pc..') '.. ovm.M[pc])
+        else
+            print(pc..') '.. ovm._mnemo[-ovm.M[pc]])
+        end
     end
 end
 
