@@ -165,11 +165,12 @@ function ovm.Run()
                 ErrorUnit.Error("input is wrong")
             end
         elseif cmd == ovm.OUT then
-            io.write(string.format("%" .. ovm.M[SP] .. "s", ovm.M[SP + 1]))
+            io.write(string.format("%"..ovm.M[SP].."s", ovm.M[SP + 1]))
             SP = SP + 2
         elseif cmd == ovm.LN then
             print()
         elseif cmd == ovm.STOP then
+            io.write()
             break
         else
             ErrorUnit.Error("command is not available")

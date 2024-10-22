@@ -481,14 +481,14 @@ function Module()
     -- elseif x.name ~= module.name then
     --     ErrorUnit.Expect("module name "..module)
     -- end
-    scan.NextLex()
+    -- scan.NextLex()
     -- Skip(Lex.DOT)
     gen.Cmd(ovm.STOP)
-    -- AllocVars() плохо работает
+    -- AllocVars()
 end
 
 function AllocVars()
-    vars = Table.GetVars() --local убран, чтобы глаза подсветка предупреждений не морочила
+    local vars = Table.GetVars()
     for v = 1, #vars do
         if vars[v].lastUse > 0 then
             gen.fixup(vars[v].lastUse, gen.PC)
