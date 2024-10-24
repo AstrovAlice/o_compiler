@@ -16,6 +16,7 @@ BEGIN
 
    In.Open;
    In.Int(n);
+   Out.Int(n, 0);
 
    c := 0;
    i := 2;

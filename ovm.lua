@@ -2,29 +2,29 @@
 local ovm = {
     MEM_SIZE = 8 * 1024,
 
-    STOP = -1,
-    ADD = -2,
-    SUB = -3,
-    MULT = -4,
-    DIV = -5,
-    MOD = -6,
-    NEG = -7,
-    LOAD = -8,
-    SAVE = -9,
-    DUP = -10,
-    DROP = -11,
-    SWAP = -12,
-    OVER = -13,
-    GOTO = -14,
-    IFLT = -15,
-    IFLE = -16,
-    IFGT = -17,
-    IFGE = -18,
-    IFEQ = -19,
-    IFNE = -20,
-    IN = -21,
-    OUT = -22,
-    LN = -23,
+    STOP =  -1,
+    ADD =   -2,
+    SUB =   -3,
+    MULT =  -4,
+    DIV =   -5,
+    MOD =   -6,
+    NEG =   -7,
+    LOAD =  -8,
+    SAVE =  -9,
+    DUP =   -10,
+    DROP =  -11,
+    SWAP =  -12,
+    OVER =  -13,
+    GOTO =  -14,
+    IFLT =  -15,
+    IFLE =  -16,
+    IFGT =  -17,
+    IFGE =  -18,
+    IFEQ =  -19,
+    IFNE =  -20,
+    IN =    -21,
+    OUT =   -22,
+    LN =    -23,
 
     _mnemo = {
         [1]="",
@@ -165,7 +165,9 @@ function ovm.Run()
                 ErrorUnit.Error("input is wrong")
             end
         elseif cmd == ovm.OUT then
-            io.write(string.format("%"..ovm.M[SP].."s", ovm.M[SP + 1]))
+            -- print("hello")
+            io.write(ovm.M[SP])
+            -- io.write(string.format("%"..ovm.M[SP].."s", ovm.M[SP + 1]))
             SP = SP + 2
         elseif cmd == ovm.LN then
             print()
