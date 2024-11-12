@@ -1,6 +1,7 @@
 --items
 local Items = {}
 
+--модули
 Items.Module = {}
 function Items.Module:new(OBJname)
     assert(type(OBJname) == "string")
@@ -13,7 +14,7 @@ function Items.Module:new(OBJname)
     self.__index = self; return obj
 end
 
-
+--константы
 Items.Const = {}
 function Items.Const:new(OBJname, OBJtype, OBJvalue)
     assert(type(OBJname) == "string")
@@ -28,7 +29,7 @@ function Items.Const:new(OBJname, OBJtype, OBJvalue)
     self.__index = self; return obj
 end
 
-
+--переменные
 Items.Var = {}
 function Items.Var:new(OBJname, OBJtype)
     assert(type(OBJname) == "string")
@@ -43,7 +44,7 @@ function Items.Var:new(OBJname, OBJtype)
     self.__index = self; return obj
 end
 
-
+--типизация
 Items.Type = {}
 function Items.Type:new(OBJname, OBJtype)
     assert(type(OBJname) == "string")
@@ -57,7 +58,7 @@ function Items.Type:new(OBJname, OBJtype)
     self.__index = self; return obj
 end
 
-
+--функции
 Items.Func = {}
 function Items.Func:new(OBJname, OBJtype)
     assert(type(OBJname) == "string")
@@ -71,7 +72,7 @@ function Items.Func:new(OBJname, OBJtype)
     self.__index = self; return obj
 end
 
-
+--процедуры
 Items.Proc = {}
 function Items.Proc:new(OBJname)
     assert(type(OBJname) == "string")

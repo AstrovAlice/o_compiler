@@ -16,14 +16,17 @@ BEGIN
 
    In.Open;
    In.Int(n);
+   In.Int(n);
    Out.Int(n, 0);
 
    c := 0;
    i := 2;
    WHILE i <= n DO
+      In.Int(n);
       d := 2;
       WHILE i MOD d # 0  DO
-          d := d + 1;
+         In.Int(n);
+         d := d + 1;
       END;
       IF d = i THEN
 

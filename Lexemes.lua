@@ -33,7 +33,7 @@ local lexemes = {
         COLON = ":",
         SEMI = ";",
         ASS = ":=",
-        SASS = 31,
+        SASS = "ВОТ ТУТ ВОТ ЧЕСТНО НЕ ЕБУ ВООБЩЕ", --исправить
         LPAR = "(",
         RPAR = ")",
         EOT = require('text').chEOT
